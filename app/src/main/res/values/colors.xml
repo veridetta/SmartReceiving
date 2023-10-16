@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <!-- Warna Utama (Hijau Kalem) -->
+    <color name="primaryColor">#4CAF50</color>
+
+    <!-- Warna Utama Light -->
+    <color name="primaryColorLight">#A5D6A7</color>
+
+    <!-- Warna Utama Dark -->
+    <color name="primaryColorDark">#388E3C</color>
+
+    <!-- Warna Sekunder (Oranye) -->
+    <color name="secondaryColor">#FF5722</color>
+
+    <!-- Warna Sekunder Light -->
+    <color name="secondaryColorLight">#FF8A50</color>
+
+    <!-- Warna Sekunder Dark -->
+    <color name="secondaryColorDark">#E64A19</color>
+
+    <!-- Warna Alternatif (Biru) -->
+    <color name="alternativeColor">#2196F3</color>
+
+    <!-- Warna Alternatif Light -->
+    <color name="alternativeColorLight">#64B5F6</color>
+
+    <!-- Warna Alternatif Dark -->
+    <color name="alternativeColorDark">#1976D2</color>
+</resources>

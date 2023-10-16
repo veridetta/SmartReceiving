@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Smart Receiving</string>
+    <string-array name="merek">
+        <item>FDR</item>
+        <item>Federal</item>
+    </string-array>
+    <string-array name="jenis">
+        <item>OEM</item>
+        <item>HGP</item>
+        <item>Tidak ada</item>
+    </string-array>
+</resources>

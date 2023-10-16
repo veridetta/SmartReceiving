@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "634132424245",
+    "project_id": "smart-receiving",
+    "storage_bucket": "smart-receiving.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:634132424245:android:4b4940fd6f2d774048337c",
+        "android_client_info": {
+          "package_name": "com.vr.smartreceiving"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDnjp1kBlX4C3G0OXgOF5FWYB_Vv7TVbk4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
