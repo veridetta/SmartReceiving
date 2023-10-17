@@ -115,9 +115,10 @@ class AddUserActivity : AppCompatActivity() {
                 "username" to username,
                 "password" to password,
                 "noHp" to noHp,
+                "role" to "user"
             )
             val db = FirebaseFirestore.getInstance()
-            db.collection("user")
+            db.collection("users")
                 .document(docId)
                 .update(barangData as Map<String, Any>)
                 .addOnSuccessListener { documentReference ->
@@ -151,12 +152,12 @@ class AddUserActivity : AppCompatActivity() {
                 "username" to username,
                 "password" to password,
                 "noHp" to noHp,
-                "role" to role,
+                "role" to "user",
                 "createdAt" to createdAt,
             )
             val db = FirebaseFirestore.getInstance()
             // Add the product data to Firestore
-            db.collection("user")
+            db.collection("users")
                 .add(userData as Map<String, Any>)
                 .addOnSuccessListener { documentReference ->
                     showSnack(this,"Berhasil menyimpan user")

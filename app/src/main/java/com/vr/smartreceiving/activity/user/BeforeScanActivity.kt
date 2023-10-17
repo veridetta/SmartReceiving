@@ -11,6 +11,10 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.firestore.FirebaseFirestore
 import com.vr.smartreceiving.R
+import com.vr.smartreceiving.activity.admin.AddUserActivity
+import com.vr.smartreceiving.activity.admin.AdminActivity
+import com.vr.smartreceiving.activity.user.scan.FirstScanActivity
+import com.vr.smartreceiving.activity.user.scan.SingleScanActivity
 import com.vr.smartreceiving.adapter.BarangAdapter
 import com.vr.smartreceiving.adapter.ReportAdapter
 import com.vr.smartreceiving.adapter.ScanAdapter
@@ -18,6 +22,7 @@ import com.vr.smartreceiving.helper.showSnack
 import com.vr.smartreceiving.model.BarangModel
 import com.vr.smartreceiving.model.ReportDetailModel
 import com.vr.smartreceiving.model.ReportModel
+import com.vr.smartreceiving.model.UserModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -38,19 +43,27 @@ class BeforeScanActivity : AppCompatActivity() {
     private val itemList: MutableList<ReportDetailModel> = mutableListOf()
     lateinit var mFirestore: FirebaseFirestore
     private var type =""
-    private var qr =""
     private var lengkap = false
-    private var isRack = false
+    private var isRack = "false"
     private var namaRack = ""
+    private var scannedItem = ""
+    private var maxItem = ""
+    private var itemNama = ""
     private var rackId = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_before_scan)
+        initView()
+        initIntent()
+        setIntent()
+        initListener()
+        initRc()
+        initData()
     }
     private fun initView(){
         mFirestore = FirebaseFirestore.getInstance()
-        recyclerView = findViewById(R.id.rcBarang)
+        recyclerView = findViewById(R.id.rcItem)
         btnScanRack = findViewById(R.id.btnScanRack)
         btnScanQr = findViewById(R.id.btnScanQr)
         tvRack = findViewById(R.id.tvRack)
@@ -61,12 +74,12 @@ class BeforeScanActivity : AppCompatActivity() {
     }
     private fun initListener(){
         btnScanRack.setOnClickListener {
-            if(isRack){
+            if(isRack=="true"){
                 showSnack(this,"Rack sudah di scan")
             }else{
-                val intent = Intent(this, ScanActivity::class.java)
+                val intent = Intent(this, RakScanActivity::class.java)
                 intent.putExtra("type",type)
-                intent.putExtra("qr","rack")
+                intent.putExtra("namaRack",namaRack)
                 startActivity(intent)
             }
         }
@@ -74,21 +87,33 @@ class BeforeScanActivity : AppCompatActivity() {
             if(lengkap){
                 showSnack(this,"Semua barang sudah di scan")
             }else{
-                if (!isRack){
+                if (isRack=="false"){
                     showSnack(this,"Scan rack terlebih dahulu")
                 }else{
-                    val intent = Intent(this, ScanActivity::class.java)
-                    intent.putExtra("type",type)
-                    intent.putExtra("qr","qr")
-                    startActivity(intent)
+                    if(type=="HGP" || type=="FDR"){
+                        val intent = Intent(this, FirstScanActivity::class.java)
+                        intent.putExtra("rackId",rackId)
+                        intent.putExtra("itemNama",itemNama)
+                        intent.putExtra("namaRack",namaRack)
+                        intent.putExtra("type",type)
+                        startActivity(intent)
+                        finish()
+                    }else{
+                        val intent = Intent(this, SingleScanActivity::class.java)
+                        intent.putExtra("rackId",rackId)
+                        intent.putExtra("itemNama",itemNama)
+                        intent.putExtra("namaRack",namaRack)
+                        intent.putExtra("type",type)
+                        startActivity(intent)
+                        finish()
+                    }
                 }
             }
         }
         btnTerima.setOnClickListener {
             if (lengkap){
                 progressDialog.setMessage("Loading...")
-                progressDialog.show()
-                //update ke fb set status = diterima
+                terima()
             }else{
                 showSnack(this,"Data belum lengkap")
             }
@@ -96,13 +121,15 @@ class BeforeScanActivity : AppCompatActivity() {
     }
     private fun initIntent(){
         type = intent.getStringExtra("type").toString()
-        qr = intent.getStringExtra("qr").toString()
-        isRack = intent.getBooleanExtra("isRack",false)
+        Log.d("TYPE",type)
+        isRack = intent.getStringExtra("isRack")?:"false"
         lengkap = intent.getBooleanExtra("lengkap",false)
         namaRack = intent.getStringExtra("namaRack").toString()
+        rackId = intent.getStringExtra("rackId").toString()
+        itemNama = intent.getStringExtra("itemNama").toString()
     }
     private fun setIntent(){
-        if (isRack){
+        if (isRack=="true"){
             tvRack.text = namaRack
         }
     }
@@ -131,7 +158,6 @@ class BeforeScanActivity : AppCompatActivity() {
                 val reports = mutableListOf<ReportDetailModel>()
                 var jumlah = 0
                 var satuan = ""
-                var jumlahScan = ""
                 for (document in result) {
                     val report = document.toObject(ReportDetailModel::class.java)
                     val docId = document.id
@@ -140,11 +166,22 @@ class BeforeScanActivity : AppCompatActivity() {
                     Log.d(TAG, "Datanya : ${document.id} => ${document.data}")
                     jumlah++
                     satuan = report.satuan.toString()
-                    jumlahScan = report.jumlah.toString()
+                    maxItem = report.perRak.toString()
+                    var item = "("+report.itemMerek+") "+report.itemNama
+                    if(report.itemJenis == ""){
+                        item += " - "+report.itemJenis
+                    }else{
+                        item += ""
+                    }
+                    tvItemNama.text = "Item "+item
                 }
 
                 withContext(Dispatchers.Main) {
-                    tvItemJumlah.text = "Jumlah "+jumlah.toString()+"/"+jumlahScan+" "+satuan
+                    if(jumlah.equals(maxItem)){
+                        lengkap=true
+                    }
+                    scannedItem = jumlah.toString()
+                    tvItemJumlah.text = "Jumlah "+jumlah.toString()+"/"+maxItem+" "+satuan
                     itemList.addAll(reports)
                     itemAdapter.filteredBarangList.addAll(reports)
                     itemAdapter.notifyDataSetChanged()
@@ -155,6 +192,31 @@ class BeforeScanActivity : AppCompatActivity() {
                 progressDialog.dismiss()
             }
         }
+    }
+    private fun terima(){
+        progressDialog.show()
+        val barangData = hashMapOf(
+            "jumlah" to maxItem,
+            "status" to "lengkap"
+        )
+        val db = FirebaseFirestore.getInstance()
+        db.collection("report")
+            .document(rackId)
+            .update(barangData as Map<String, Any>)
+            .addOnSuccessListener { documentReference ->
+                showSnack(this,"Berhasil menyimpan barang")
+                progressDialog.dismiss()
+                // Redirect to SellerActivity fragment home
+                val intent = Intent(this, ReportActivityUser::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+                startActivity(intent)
+                finish()
+            }
+            .addOnFailureListener { e ->
+                // Error occurred while adding product
+                progressDialog.dismiss()
+                showSnack(this,"Gagal menyimpan barang ${e.message}")
+            }
     }
 
 }

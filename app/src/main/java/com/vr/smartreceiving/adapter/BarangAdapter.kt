@@ -68,7 +68,7 @@ class BarangAdapter(
             holder.tvJenis.text = " - "+currentBarang.jenis
         }
         holder.tvQr.text = currentBarang.kode1+" "+currentBarang.kode2
-        holder.tvPerdus.text = currentBarang.perRak+" "+currentBarang.satuan+" /rak"
+        holder.tvPerdus.text = currentBarang.perRak+" "+currentBarang.satuan+" /Rack"
         holder.btnUbah.setOnClickListener { onEditClickListener(currentBarang) }
         holder.btnHapus.setOnClickListener { onHapusClickListener(currentBarang) }
     }

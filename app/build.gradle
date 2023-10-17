@@ -6,12 +6,12 @@ plugins {
 
 android {
     namespace 'com.vr.smartreceiving'
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.vr.smartreceiving"
         minSdk 24
-        targetSdk 33
+        targetSdk 34
         versionCode 1
         versionName "1.0"
 
@@ -61,5 +61,6 @@ dependencies {
     implementation 'com.facebook.shimmer:shimmer:0.5.0'
     //sdp
     implementation 'com.intuit.sdp:sdp-android:1.0.6'
-    implementation 'com.github.hamzaahmedkhan:SpinnerDialog:v1.2.3'
+    //implementation 'com.github.hamzaahmedkhan:SpinnerDialog:v1.2.3'
+    implementation 'com.github.yuriy-budiyev:code-scanner:2.3.2'
 }

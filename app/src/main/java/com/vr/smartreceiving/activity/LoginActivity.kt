@@ -44,19 +44,21 @@ class LoginActivity : AppCompatActivity() {
     }
     fun clickView(){
         buttonLogin.setOnClickListener {
+            progressDialog.show()
             val email = editTextEmail.text.toString()
             val password = editTextPassword.text.toString()
-            firestore.collection("users").whereEqualTo("email", email).whereEqualTo("password", password).limit(1).get()
+            firestore.collection("users").whereEqualTo("username", email).whereEqualTo("password", password).limit(1).get()
                 .addOnSuccessListener { documentSnapshot ->
+                    progressDialog.dismiss()
                     val userRole = documentSnapshot.documents[0].getString("role")
                     // Save user role to SharedPreferences
                     val sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE)
                     val editor = sharedPreferences.edit()
                     editor.putBoolean("isLogin", true)
                     editor.putString("userRole", userRole)
-                    editor.putString("userUid", documentSnapshot.documents[0].id)
+                    editor.putString("userUid", documentSnapshot.documents[0].getString("uid"))
                     editor.putString("userName",   documentSnapshot.documents[0].getString("nama"))
-                    editor.putString("userEmail", documentSnapshot.documents[0].getString("email"))
+                    editor.putString("userUsername", documentSnapshot.documents[0].getString("username"))
                     editor.apply()
                     Log.d("Login","Role $userRole")
                     // Redirect to appropriate activity based on user role
@@ -73,6 +75,7 @@ class LoginActivity : AppCompatActivity() {
                     finish()
                 }
                 .addOnFailureListener {
+                    progressDialog.dismiss()
                     showSnack(this, "Login failed. Please check your credentials.")
                 }
         }

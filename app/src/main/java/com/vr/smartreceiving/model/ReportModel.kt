@@ -5,6 +5,7 @@ class ReportModel(
     var docId: String? = null,
     var nama: String? = null,
     var perRak: String? = null,
+    var rakId: String? = null,
     var status: String? = null,
     var itemNama: String? = null,
     var nomorPenerimaan: String? = null,

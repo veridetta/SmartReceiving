@@ -48,7 +48,7 @@ class ScanAdapter(
     }
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductViewHolder {
         val itemView = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_report, parent, false)
+            .inflate(R.layout.item_scan, parent, false)
         return ProductViewHolder(itemView)
     }
 
@@ -58,7 +58,7 @@ class ScanAdapter(
 
     override fun onBindViewHolder(holder: ProductViewHolder, position: Int) {
         val currentBarang = filteredBarangList[position]
-        var item = "Item ("+currentBarang.itemMerek+") "+currentBarang.itemNama
+        var item = "("+currentBarang.itemMerek+") "+currentBarang.itemNama
         if(currentBarang.itemJenis == ""){
             item += " - "+currentBarang.itemJenis
         }else{

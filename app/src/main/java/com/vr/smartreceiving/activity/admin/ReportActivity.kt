@@ -24,7 +24,6 @@ class ReportActivity : AppCompatActivity() {
     private lateinit var reportAdapter: ReportAdapter
     private lateinit var recyclerView: RecyclerView
     private lateinit var contentView: RelativeLayout
-    private lateinit var searchLayout: LinearLayout
     private lateinit var btnBack: ImageView
     private lateinit var progressDialog: ProgressDialog
     val TAG = "LOAD DATA"
@@ -43,7 +42,6 @@ class ReportActivity : AppCompatActivity() {
         mFirestore = FirebaseFirestore.getInstance()
         recyclerView = findViewById(R.id.rcReport)
         contentView = findViewById(R.id.contentView)
-        searchLayout = findViewById(R.id.searchLayout)
         btnBack = findViewById(R.id.btnBack)
         progressDialog = ProgressDialog(this)
         progressDialog.setMessage("Loading...")
@@ -70,7 +68,7 @@ class ReportActivity : AppCompatActivity() {
         progressDialog.show()
         GlobalScope.launch(Dispatchers.IO) {
             try {
-                val result = mFirestore.collection("report").get().await()
+                val result = mFirestore.collection("report").whereEqualTo("status","lengkap").get().await()
                 val reports = mutableListOf<ReportModel>()
                 for (document in result) {
                     val report = document.toObject(ReportModel::class.java)

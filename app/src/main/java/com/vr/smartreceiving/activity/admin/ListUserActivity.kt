@@ -55,7 +55,7 @@ class ListUserActivity : AppCompatActivity() {
     }
     private fun initView(){
         mFirestore = FirebaseFirestore.getInstance()
-        recyclerView = findViewById(R.id.rcBarang)
+        recyclerView = findViewById(R.id.rcUser)
         contentView = findViewById(R.id.contentView)
         searchLayout = findViewById(R.id.searchLayout)
         btnCari = findViewById(R.id.btnCari)
@@ -100,7 +100,7 @@ class ListUserActivity : AppCompatActivity() {
         progressDialog.show()
         GlobalScope.launch(Dispatchers.IO) {
             try {
-                val result = mFirestore.collection("user").whereEqualTo("role","user").get().await()
+                val result = mFirestore.collection("users").whereEqualTo("role","user").get().await()
                 val users = mutableListOf<UserModel>()
                 for (document in result) {
                     val user = document.toObject(UserModel::class.java)

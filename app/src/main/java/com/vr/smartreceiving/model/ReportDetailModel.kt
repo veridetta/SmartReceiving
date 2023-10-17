@@ -16,7 +16,6 @@ class ReportDetailModel(
     var satuan: String? = null,
     var petugasNama: String? = null,
     var petugasUid: String? = null,
-    var jumlah: String? = null,
     var scanAt: String? = null,
     var editAt: String? = null,
     var createdAt: String? = null,
