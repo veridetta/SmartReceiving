@@ -35,7 +35,9 @@ import kotlin.random.Random
 
 class SingleScanActivity : AppCompatActivity() {
     var rackId=""
+    var namaRack=""
     var itemNama=""
+    var rackDocId=""
     var type=""
     var kode1=""
     private lateinit var codeScanner: CodeScanner
@@ -95,7 +97,9 @@ class SingleScanActivity : AppCompatActivity() {
     private fun initIntent(){
         rackId = intent.getStringExtra("rackId").toString()
         itemNama = intent.getStringExtra("itemNama").toString()
-        itemNama = intent.getStringExtra("type").toString()
+        rackDocId = intent.getStringExtra("rackDocId").toString()
+        type = intent.getStringExtra("type").toString()
+        namaRack = intent.getStringExtra("namaRack").toString()
     }
     override fun onResume() {
         super.onResume()
@@ -115,6 +119,7 @@ class SingleScanActivity : AppCompatActivity() {
                     .get().await()
                 val reports = mutableListOf<BarangModel>()
                 var ada = false
+                var beda = false
                 for (document in result) {
                     val report = document.toObject(BarangModel::class.java)
                     val docId = document.id
@@ -122,129 +127,129 @@ class SingleScanActivity : AppCompatActivity() {
                     reports.add(report)
                     Log.d("SCN", "Datanya : ${document.id} => ${document.data}")
                      ada = true
+                    if (itemNama =="" ){
+                        beda=false
+                    }else{
+                        //itemNaa tidak sama  degan report.nama
+                        if (itemNama==report.nama){
+                            beda=false
+                        }else{
+                            beda=true
+                        }
+                    }
                 }
                 withContext(Dispatchers.Main) {
                     if(ada){
-                        //simpan data ke report firebase
-                        val currentDateTime = LocalDateTime.now()
-                        val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")
-                        val formatted = currentDateTime.format(formatter)
-                        val createdAt = formatted
-                        val nama = "ra"+generateRandomString(7)
-                        //ambil uid dan nama dari sharedpreferences
-                        val sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE)
-                        val petugasUid = sharedPreferences.getString("userUid", "")
-                        val petugasNama = sharedPreferences.getString("userName", "")
-                        val nomorPenerimaan = "np"+generateRandomString(8)
-                        if(itemNama==""){
-                            val barangData = hashMapOf(
-                                "perRak" to reports[0].perRak.toString(),
-                                "jenis" to reports[0].jenis.toString(),
-                                "merek" to reports[0].merek.toString(),
-                                "satuan" to reports[0].satuan.toString(),
-                                "itemNama" to reports[0].nama.toString(),
-                                "itemUid" to reports[0].uid.toString(),
-                            )
-                            val db = FirebaseFirestore.getInstance()
-                            val reportCollection = db.collection("report")
-                            //update
-                            reportCollection.whereEqualTo("rakId",rackId).get()
-                                .addOnSuccessListener { documentReference ->
-                                    for (document in documentReference.documents) {
-                                        // Perbarui dokumen dengan data yang baru
-                                        reportCollection.document(document.id).update(barangData as Map<String, Any>)
-                                            .addOnSuccessListener {
-                                                // Pembaruan berhasil
-                                                showSnack(this@SingleScanActivity, "Berhasil memperbarui barang")
-                                                val barangData2 = hashMapOf(
-                                                    "uid" to UUID.randomUUID().toString(),
-                                                    "nama" to nama,
-                                                    "perRak" to reports[0].perRak.toString(),
-                                                    "rackId" to rackId,
-                                                    "itemId" to itemId,
-                                                    "itemNama" to reports[0].nama.toString(),
-                                                    "nomorPenerimaan" to nomorPenerimaan,
-                                                    "itemUid" to reports[0].uid.toString(),
-                                                    "itemMerek" to reports[0].merek.toString(),
-                                                    "itemNum" to kode1,
-                                                    "itemJenis" to reports[0].jenis.toString(),
-                                                    "satuan" to reports[0].satuan.toString(),
-                                                    "petugasUid" to petugasUid,
-                                                    "petugasNama" to petugasNama,
-                                                    "createdAt" to createdAt,
-                                                    "scanAt" to createdAt
-                                                )
-                                                val db2 = FirebaseFirestore.getInstance()
-                                                // Add the product data to Firestore
-                                                db2.collection("reportDetail")
-                                                    .add(barangData2 as Map<String, Any>)
-                                                    .addOnSuccessListener { documentReferencex ->
-                                                        showSnack(this@SingleScanActivity,"Berhasil menyimpan barang")
-                                                        // Redirect to SellerActivity fragment home
-                                                        // Redirect to SellerActivity fragment home
-                                                        val intent = Intent(this@SingleScanActivity, BeforeScanActivity::class.java)
-                                                        intent.putExtra("rackId",rackId)
-                                                        intent.putExtra("namaRack",nama)
-                                                        intent.putExtra("type",type)
-                                                        startActivity(intent)
-                                                        finish()
-                                                    }
-                                                    .addOnFailureListener { e ->
-                                                        // Error occurred while adding product
-                                                        showSnack(this@SingleScanActivity,"Gagal menyimpan barang ${e.message}")
-                                                    }
+                        if(beda){
+                            showSnack(this@SingleScanActivity, "Data tidak sesuai")
+                        }else{
+                            //simpan data ke report firebase
+                            val currentDateTime = LocalDateTime.now()
+                            val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")
+                            val formatted = currentDateTime.format(formatter)
+                            val createdAt = formatted
+                            val nama = "ra"+generateRandomString(7)
+                            //ambil uid dan nama dari sharedpreferences
+                            val sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE)
+                            val petugasUid = sharedPreferences.getString("userUid", "")
+                            val petugasNama = sharedPreferences.getString("userName", "")
+                            val nomorPenerimaan = "np"+generateRandomString(8)
+                            if(itemNama==""){
+                                val barangData = hashMapOf(
+                                    "perRak" to reports[0].perRak.toString(),
+                                    "jenis" to reports[0].jenis.toString(),
+                                    "merek" to reports[0].merek.toString(),
+                                    "satuan" to reports[0].satuan.toString(),
+                                    "itemNama" to reports[0].nama.toString(),
+                                    "itemUid" to reports[0].uid.toString(),
+                                )
+                                val db = FirebaseFirestore.getInstance()
+                                val reportCollection = db.collection("report")
+                                reportCollection.document(rackDocId).update(barangData as Map<String, Any>)
+                                    .addOnSuccessListener { documentReference ->
+                                        showSnack(this@SingleScanActivity, "Berhasil memperbarui barang")
+                                        val barangData2 = hashMapOf(
+                                            "uid" to UUID.randomUUID().toString(),
+                                            "nama" to namaRack,
+                                            "perRak" to reports[0].perRak.toString(),
+                                            "rakId" to rackId,
+                                            "itemId" to itemId,
+                                            "itemNama" to reports[0].nama.toString(),
+                                            "nomorPenerimaan" to nomorPenerimaan,
+                                            "itemUid" to reports[0].uid.toString(),
+                                            "itemMerek" to reports[0].merek.toString(),
+                                            "itemNum" to kode1,
+                                            "itemJenis" to reports[0].jenis.toString(),
+                                            "satuan" to reports[0].satuan.toString(),
+                                            "petugasUid" to petugasUid,
+                                            "petugasNama" to petugasNama,
+                                            "createdAt" to createdAt,
+                                            "scanAt" to createdAt
+                                        )
+                                        val db2 = FirebaseFirestore.getInstance()
+                                        // Add the product data to Firestore
+                                        db2.collection("reportDetail")
+                                            .add(barangData2 as Map<String, Any>)
+                                            .addOnSuccessListener { documentReferencex ->
+                                                showSnack(this@SingleScanActivity,"Berhasil menyimpan barang")
+                                                val intent = Intent(this@SingleScanActivity, BeforeScanActivity::class.java)
+                                                intent.putExtra("rackId",rackId)
+                                                intent.putExtra("namaRack",namaRack)
+                                                intent.putExtra("aksi","reload")
+                                                intent.putExtra("type",type)
+                                                startActivity(intent)
+                                                finish()
                                             }
                                             .addOnFailureListener { e ->
-                                                // Kesalahan saat pembaruan
-                                                showSnack(this@SingleScanActivity, "Gagal memperbarui barang: ${e.message}")
+                                                // Error occurred while adding product
+                                                showSnack(this@SingleScanActivity,"Gagal menyimpan barang ${e.message}")
                                             }
                                     }
-
-                                }
-                                .addOnFailureListener { e ->
-                                    // Error occurred while adding product
-                                    showSnack(this@SingleScanActivity,"Gagal menyimpan barang ${e.message}")
-                                }
-                        }else{
-                            val barangData2 = hashMapOf(
-                                "uid" to UUID.randomUUID().toString(),
-                                "nama" to nama,
-                                "perRak" to reports[0].perRak.toString(),
-                                "rackId" to rackId,
-                                "itemId" to itemId,
-                                "itemNama" to reports[0].nama.toString(),
-                                "nomorPenerimaan" to nomorPenerimaan,
-                                "itemUid" to reports[0].uid.toString(),
-                                "itemMerek" to reports[0].merek.toString(),
-                                "itemNum" to kode1,
-                                "itemJenis" to reports[0].jenis.toString(),
-                                "satuan" to reports[0].satuan.toString(),
-                                "petugasUid" to petugasUid,
-                                "petugasNama" to petugasNama,
-                                "createdAt" to createdAt,
-                                "scanAt" to createdAt
-                            )
-                            val db2 = FirebaseFirestore.getInstance()
-                            // Add the product data to Firestore
-                            db2.collection("reportDetail")
-                                .add(barangData2 as Map<String, Any>)
-                                .addOnSuccessListener { documentReferencex ->
-                                    showSnack(this@SingleScanActivity,"Berhasil menyimpan barang")
-                                    // Redirect to SellerActivity fragment home
-                                    // Redirect to SellerActivity fragment home
-                                    val intent = Intent(this@SingleScanActivity, BeforeScanActivity::class.java)
-                                    intent.putExtra("rackId",rackId)
-                                    intent.putExtra("namaRack",nama)
-                                    intent.putExtra("type",type)
-                                    startActivity(intent)
-                                    finish()
-                                }
-                                .addOnFailureListener { e ->
-                                    // Error occurred while adding product
-                                    showSnack(this@SingleScanActivity,"Gagal menyimpan barang ${e.message}")
-                                }
+                                    .addOnFailureListener { e ->
+                                        // Error occurred while adding product
+                                        showSnack(this@SingleScanActivity,"Gagal menyimpan barang ${e.message}")
+                                    }
+                            }else{
+                                val barangData2 = hashMapOf(
+                                    "uid" to UUID.randomUUID().toString(),
+                                    "nama" to nama,
+                                    "perRak" to reports[0].perRak.toString(),
+                                    "rackId" to rackId,
+                                    "itemId" to itemId,
+                                    "itemNama" to reports[0].nama.toString(),
+                                    "nomorPenerimaan" to nomorPenerimaan,
+                                    "itemUid" to reports[0].uid.toString(),
+                                    "itemMerek" to reports[0].merek.toString(),
+                                    "itemNum" to kode1,
+                                    "itemJenis" to reports[0].jenis.toString(),
+                                    "satuan" to reports[0].satuan.toString(),
+                                    "petugasUid" to petugasUid,
+                                    "petugasNama" to petugasNama,
+                                    "createdAt" to createdAt,
+                                    "scanAt" to createdAt
+                                )
+                                val db2 = FirebaseFirestore.getInstance()
+                                // Add the product data to Firestore
+                                db2.collection("reportDetail")
+                                    .add(barangData2 as Map<String, Any>)
+                                    .addOnSuccessListener { documentReferencex ->
+                                        showSnack(this@SingleScanActivity,"Berhasil menyimpan barang")
+                                        // Redirect to SellerActivity fragment home
+                                        // Redirect to SellerActivity fragment home
+                                        val intent = Intent(this@SingleScanActivity, BeforeScanActivity::class.java)
+                                        intent.putExtra("rackId",rackId)
+                                        intent.putExtra("namaRack",nama)
+                                        intent.putExtra("type",type)
+                                        startActivity(intent)
+                                        finish()
+                                    }
+                                    .addOnFailureListener { e ->
+                                        // Error occurred while adding product
+                                        showSnack(this@SingleScanActivity,"Gagal menyimpan barang ${e.message}")
+                                    }
+                            }
+                            progressDialog.dismiss()
                         }
-                        progressDialog.dismiss()
                     }else{
                         showSnack(this@SingleScanActivity, "Data tidak ditemukan")
                         codeScanner.startPreview()

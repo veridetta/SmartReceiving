@@ -43,6 +43,36 @@
             android:gravity="bottom"
             android:textColor="@color/black"
             android:layout_marginTop="4dp" />
-
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="2"
+            android:layout_marginTop="8dp">
+            <LinearLayout
+                android:id="@+id/lyiconEdit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:gravity="end">
+                <LinearLayout
+                    android:id="@+id/btnHapus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_rounded"
+                    android:gravity="center_vertical"
+                    android:padding="@dimen/_5sdp"
+                    android:backgroundTint="@color/secondaryColor"
+                    android:layout_marginStart="@dimen/_5sdp"
+                    android:orientation="horizontal">
+                    <ImageView
+                        android:layout_width="@dimen/_16sdp"
+                        android:layout_height="@dimen/_16sdp"
+                        android:src="@drawable/ic_delete"
+                        app:tint="@color/black"
+                        android:layout_gravity="center_vertical" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
     </LinearLayout>
 </androidx.cardview.widget.CardView>

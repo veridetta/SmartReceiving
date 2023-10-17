@@ -10,12 +10,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.vr.smartreceiving.R
 import com.vr.smartreceiving.model.BarangModel
 import com.vr.smartreceiving.model.ReportDetailModel
+import com.vr.smartreceiving.model.UserModel
 import java.util.Locale
 
 
 class ScanAdapter(
     private var barangList: MutableList<ReportDetailModel>,
     val context: Context,
+    private val onHapusClickListener: (ReportDetailModel) -> Unit,
 ) : RecyclerView.Adapter<ScanAdapter.ProductViewHolder>() {
     public var filteredBarangList: MutableList<ReportDetailModel> = mutableListOf()
     init {
@@ -65,13 +67,15 @@ class ScanAdapter(
             item += ""
         }
         holder.tvItemNama.text = "Item "+item
-holder.tvItemNum.text = "ID "+currentBarang.itemNum
+        holder.tvItemNum.text = "ID "+currentBarang.itemNum
         holder.tvScanAt.text = "Scan pada "+currentBarang.scanAt
+        holder.btnHapus.setOnClickListener { onHapusClickListener(currentBarang) }
     }
 
     inner class ProductViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val tvItemNum: TextView = itemView.findViewById(R.id.tvItemNum)
         val tvItemNama: TextView = itemView.findViewById(R.id.tvItemNama)
         val tvScanAt: TextView = itemView.findViewById(R.id.tvScanAt)
+        val btnHapus: TextView = itemView.findViewById(R.id.btnHapus)
     }
 }

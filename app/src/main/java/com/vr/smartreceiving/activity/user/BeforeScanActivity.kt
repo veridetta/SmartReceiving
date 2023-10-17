@@ -1,5 +1,6 @@
 package com.vr.smartreceiving.activity.user
 
+import android.app.AlertDialog
 import android.app.ProgressDialog
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
@@ -13,6 +14,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.vr.smartreceiving.R
 import com.vr.smartreceiving.activity.admin.AddUserActivity
 import com.vr.smartreceiving.activity.admin.AdminActivity
+import com.vr.smartreceiving.activity.admin.ListUserActivity
 import com.vr.smartreceiving.activity.user.scan.FirstScanActivity
 import com.vr.smartreceiving.activity.user.scan.SingleScanActivity
 import com.vr.smartreceiving.adapter.BarangAdapter
@@ -50,6 +52,7 @@ class BeforeScanActivity : AppCompatActivity() {
     private var maxItem = ""
     private var itemNama = ""
     private var rackId = ""
+    private var rackDocId = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -81,6 +84,7 @@ class BeforeScanActivity : AppCompatActivity() {
                 intent.putExtra("type",type)
                 intent.putExtra("namaRack",namaRack)
                 startActivity(intent)
+                finish()
             }
         }
         btnScanQr.setOnClickListener {
@@ -96,12 +100,14 @@ class BeforeScanActivity : AppCompatActivity() {
                         intent.putExtra("itemNama",itemNama)
                         intent.putExtra("namaRack",namaRack)
                         intent.putExtra("type",type)
+                        intent.putExtra("rackDocId",rackDocId)
                         startActivity(intent)
                         finish()
                     }else{
                         val intent = Intent(this, SingleScanActivity::class.java)
                         intent.putExtra("rackId",rackId)
                         intent.putExtra("itemNama",itemNama)
+                        intent.putExtra("rackDocId",rackDocId)
                         intent.putExtra("namaRack",namaRack)
                         intent.putExtra("type",type)
                         startActivity(intent)
@@ -127,6 +133,7 @@ class BeforeScanActivity : AppCompatActivity() {
         namaRack = intent.getStringExtra("namaRack").toString()
         rackId = intent.getStringExtra("rackId").toString()
         itemNama = intent.getStringExtra("itemNama").toString()
+        rackDocId = intent.getStringExtra("rackDocId").toString()
     }
     private fun setIntent(){
         if (isRack=="true"){
@@ -141,7 +148,38 @@ class BeforeScanActivity : AppCompatActivity() {
             itemAdapter = ScanAdapter(
                 itemList,
                 this@BeforeScanActivity
-            )
+            ){ scan -> hapusBarang(scan) }
+        }
+    }
+    private fun hapusBarang(scan: ReportDetailModel) {
+        //dialog konfirmasi
+        val builder = AlertDialog.Builder(this)
+        builder.setMessage("Yakin ingin menghapus ${scan.nama}?")
+        builder.setPositiveButton("Ya") { dialog, which ->
+            //hapus barang dari firestore
+            progressDialog.show()
+            val db = FirebaseFirestore.getInstance()
+            db.collection("reportDetail").document(scan.docId.toString())
+                .delete()
+                .addOnSuccessListener {
+                    showSnack(this,"Berhasil menghapus item")
+                    progressDialog.dismiss()
+                    // Redirect to SellerActivity fragment home
+                    val intent = Intent(this, BeforeScanActivity::class.java)
+                    intent.putExtra("rackId",rackId)
+                    intent.putExtra("namaRack",namaRack)
+                    intent.putExtra("aksi","reload")
+                    intent.putExtra("type",type)
+                    startActivity(intent)
+                    finish()
+                    startActivity(intent)
+                    finish()
+                }
+                .addOnFailureListener { e ->
+                    // Error occurred while adding product
+                    Log.w(TAG, "Error getting documents : $e")
+                    progressDialog.dismiss()
+                }
         }
     }
     private fun initData(){
@@ -153,7 +191,7 @@ class BeforeScanActivity : AppCompatActivity() {
         progressDialog.show()
         GlobalScope.launch(Dispatchers.IO) {
             try {
-                val result = mFirestore.collection("reportDetail").whereEqualTo("rackId",rackId)
+                val result = mFirestore.collection("reportDetail").whereEqualTo("rakId",rackId)
                     .get().await()
                 val reports = mutableListOf<ReportDetailModel>()
                 var jumlah = 0
@@ -165,21 +203,22 @@ class BeforeScanActivity : AppCompatActivity() {
                     reports.add(report)
                     Log.d(TAG, "Datanya : ${document.id} => ${document.data}")
                     jumlah++
-                    satuan = report.satuan.toString()
-                    maxItem = report.perRak.toString()
-                    var item = "("+report.itemMerek+") "+report.itemNama
-                    if(report.itemJenis == ""){
-                        item += " - "+report.itemJenis
-                    }else{
-                        item += ""
-                    }
-                    tvItemNama.text = "Item "+item
                 }
 
                 withContext(Dispatchers.Main) {
                     if(jumlah.equals(maxItem)){
                         lengkap=true
                     }
+                    satuan = reports[0].satuan.toString()
+                    itemNama = reports[0].itemNama.toString()
+                    maxItem = reports[0].perRak.toString()
+                    var itemz = "("+reports[0].itemMerek+") "+reports[0].itemNama
+                    if(reports[0].itemJenis == ""){
+                        itemz += " - "+reports[0].itemJenis
+                    }else{
+                        itemz += ""
+                    }
+                    tvItemNama.text = "Item "+itemz
                     scannedItem = jumlah.toString()
                     tvItemJumlah.text = "Jumlah "+jumlah.toString()+"/"+maxItem+" "+satuan
                     itemList.addAll(reports)
@@ -218,5 +257,4 @@ class BeforeScanActivity : AppCompatActivity() {
                 showSnack(this,"Gagal menyimpan barang ${e.message}")
             }
     }
-
 }

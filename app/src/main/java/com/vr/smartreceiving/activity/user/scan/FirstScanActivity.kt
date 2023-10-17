@@ -38,6 +38,7 @@ class FirstScanActivity : AppCompatActivity() {
     var itemNama=""
     var namaRack=""
     var type=""
+    var rackDocId=""
     private lateinit var codeScanner: CodeScanner
     private lateinit var scannerView: CodeScannerView
     private lateinit var progressDialog : ProgressDialog
@@ -84,8 +85,9 @@ class FirstScanActivity : AppCompatActivity() {
     private fun initIntent(){
         rackId = intent.getStringExtra("rackId").toString()
         itemNama = intent.getStringExtra("itemNama").toString()
-        itemNama = intent.getStringExtra("type").toString()
+        type = intent.getStringExtra("type").toString()
         namaRack = intent.getStringExtra("namaRack").toString()
+        rackDocId = intent.getStringExtra("rackDocId").toString()
     }
     override fun onResume() {
         super.onResume()
@@ -105,12 +107,26 @@ class FirstScanActivity : AppCompatActivity() {
                 val result = mFirestore.collection("barang").whereEqualTo("kode1",qrCode).get().await()
                 val reports = mutableListOf<BarangModel>()
                 var ada = false
+                var beda = false
                 for (document in result) {
                     val report = document.toObject(BarangModel::class.java)
                     val docId = document.id
                     report.docId = docId
                     reports.add(report)
                     ada=true
+                    //cek jika itemnama kosong
+                    Log.d("FIrst", "itemNama "+itemNama)
+                    Log.d("FIrst", "rerportNama "+report.nama)
+                    if (itemNama =="" ){
+                        beda=false
+                    }else{
+                        //itemNaa tidak sama  degan report.nama
+                        if (itemNama==report.nama){
+                            beda=false
+                        }else{
+                            beda=true
+                        }
+                    }
                 }
                 withContext(Dispatchers.Main) {
                     progressDialog.dismiss()
@@ -118,15 +134,20 @@ class FirstScanActivity : AppCompatActivity() {
                         showSnack(this@FirstScanActivity, "Data tidak ditemukan")
                         codeScanner.startPreview()
                     }else{
-                        val intent = Intent(this@FirstScanActivity, SecondScanActivity::class.java)
-                        intent.putExtra("rackId",rackId)
-                        intent.putExtra("itemNama",itemNama)
-                        intent.putExtra("namaRack",namaRack)
-                        intent.putExtra("kode1",reports[0].kode1)
-                        intent.putExtra("kode2",reports[0].kode2)
-                        intent.putExtra("type",type)
-                        startActivity(intent)
-                        finish()
+                        if(beda){
+                            showSnack(this@FirstScanActivity, "Data tidak sesuai")
+                        }else{
+                            val intent = Intent(this@FirstScanActivity, SecondScanActivity::class.java)
+                            intent.putExtra("rackId",rackId)
+                            intent.putExtra("itemNama",itemNama)
+                            intent.putExtra("namaRack",namaRack)
+                            intent.putExtra("rackDocId",rackDocId)
+                            intent.putExtra("kode1",reports[0].kode1)
+                            intent.putExtra("kode2",reports[0].kode2)
+                            intent.putExtra("type",type)
+                            startActivity(intent)
+                            finish()
+                        }
                     }
                 }
             } catch (e: Exception) {

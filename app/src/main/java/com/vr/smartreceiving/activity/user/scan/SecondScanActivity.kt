@@ -38,6 +38,7 @@ class SecondScanActivity : AppCompatActivity() {
     var kode2=""
     var rackId=""
     var itemNama=""
+    var rackDocId=""
     var namaRack=""
     var type=""
     private lateinit var codeScanner: CodeScanner
@@ -108,6 +109,7 @@ class SecondScanActivity : AppCompatActivity() {
         itemNama = intent.getStringExtra("itemNama").toString()
         type = intent.getStringExtra("type").toString()
         namaRack = intent.getStringExtra("namaRack").toString()
+        rackDocId = intent.getStringExtra("rackDocId").toString()
     }
     override fun onResume() {
         super.onResume()
@@ -155,59 +157,45 @@ class SecondScanActivity : AppCompatActivity() {
                         )
                         val db = FirebaseFirestore.getInstance()
                         val reportCollection = db.collection("report")
-                        //update
-                        reportCollection.whereEqualTo("rakId",rackId).get()
+                        reportCollection.document(rackDocId).update(barangData as Map<String, Any>)
                             .addOnSuccessListener { documentReference ->
-                                for (documentx in documentReference.documents) {
-                                    // Perbarui dokumen dengan data yang baru
-                                    reportCollection.document(documentx.id).update(barangData as Map<String, Any>)
-                                        .addOnSuccessListener {
-                                            // Pembaruan berhasil
-                                            showSnack(this@SecondScanActivity, "Berhasil memperbarui barang")
-                                            val barangData2 = hashMapOf(
-                                                "uid" to UUID.randomUUID().toString(),
-                                                "nama" to namaRack,
-                                                "perRak" to reports[0].perRak.toString(),
-                                                "rackId" to rackId,
-                                                "itemId" to itemId,
-                                                "itemNama" to reports[0].nama.toString(),
-                                                "nomorPenerimaan" to nomorPenerimaan,
-                                                "itemUid" to reports[0].uid.toString(),
-                                                "itemMerek" to reports[0].merek.toString(),
-                                                "itemNum" to kode2,
-                                                "itemJenis" to reports[0].jenis.toString(),
-                                                "satuan" to reports[0].satuan.toString(),
-                                                "petugasUid" to petugasUid,
-                                                "petugasNama" to petugasNama,
-                                                "createdAt" to createdAt,
-                                                "scanAt" to createdAt
-                                            )
-                                            val db2 = FirebaseFirestore.getInstance()
-                                            // Add the product data to Firestore
-                                            db2.collection("reportDetail")
-                                                .add(barangData2 as Map<String, Any>)
-                                                .addOnSuccessListener { documentReferencex ->
-                                                    showSnack(this@SecondScanActivity,"Berhasil menyimpan barang")
-                                                    // Redirect to SellerActivity fragment home
-                                                    // Redirect to SellerActivity fragment home
-                                                    val intent = Intent(this@SecondScanActivity, BeforeScanActivity::class.java)
-                                                    intent.putExtra("rackId",rackId)
-                                                    intent.putExtra("namaRack",documentx.data?.get("nama").toString())
-                                                    intent.putExtra("type",type)
-                                                    startActivity(intent)
-                                                    finish()
-                                                }
-                                                .addOnFailureListener { e ->
-                                                    // Error occurred while adding product
-                                                    showSnack(this@SecondScanActivity,"Gagal menyimpan barang ${e.message}")
-                                                }
-                                        }
-                                        .addOnFailureListener { e ->
-                                            // Kesalahan saat pembaruan
-                                            showSnack(this@SecondScanActivity, "Gagal memperbarui barang: ${e.message}")
-                                        }
-                                }
-
+                                showSnack(this@SecondScanActivity, "Berhasil memperbarui barang")
+                                val barangData2 = hashMapOf(
+                                    "uid" to UUID.randomUUID().toString(),
+                                    "nama" to namaRack,
+                                    "perRak" to reports[0].perRak.toString(),
+                                    "rakId" to rackId,
+                                    "itemId" to itemId,
+                                    "itemNama" to reports[0].nama.toString(),
+                                    "nomorPenerimaan" to nomorPenerimaan,
+                                    "itemUid" to reports[0].uid.toString(),
+                                    "itemMerek" to reports[0].merek.toString(),
+                                    "itemNum" to kode2,
+                                    "itemJenis" to reports[0].jenis.toString(),
+                                    "satuan" to reports[0].satuan.toString(),
+                                    "petugasUid" to petugasUid,
+                                    "petugasNama" to petugasNama,
+                                    "createdAt" to createdAt,
+                                    "scanAt" to createdAt
+                                )
+                                val db2 = FirebaseFirestore.getInstance()
+                                // Add the product data to Firestore
+                                db2.collection("reportDetail")
+                                    .add(barangData2 as Map<String, Any>)
+                                    .addOnSuccessListener { documentReferencex ->
+                                        showSnack(this@SecondScanActivity,"Berhasil menyimpan barang")
+                                        val intent = Intent(this@SecondScanActivity, BeforeScanActivity::class.java)
+                                        intent.putExtra("rackId",rackId)
+                                        intent.putExtra("namaRack",namaRack)
+                                        intent.putExtra("aksi","reload")
+                                        intent.putExtra("type",type)
+                                        startActivity(intent)
+                                        finish()
+                                    }
+                                    .addOnFailureListener { e ->
+                                        // Error occurred while adding product
+                                        showSnack(this@SecondScanActivity,"Gagal menyimpan barang ${e.message}")
+                                    }
                             }
                             .addOnFailureListener { e ->
                                 // Error occurred while adding product
@@ -219,7 +207,7 @@ class SecondScanActivity : AppCompatActivity() {
                             "uid" to UUID.randomUUID().toString(),
                             "nama" to namaRack,
                             "perRak" to reports[0].perRak.toString(),
-                            "rackId" to rackId,
+                            "rakId" to rackId,
                             "itemId" to itemId,
                             "itemNama" to reports[0].nama.toString(),
                             "nomorPenerimaan" to nomorPenerimaan,
