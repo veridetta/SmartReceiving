@@ -61,12 +61,25 @@ class RakScanActivity : AppCompatActivity() {
         codeScanner.decodeCallback = DecodeCallback {
             runOnUiThread {
                 showSnack(this, "Scan result: ${it.text}")
+                //val input = it.text
+                //val startIndex = input.indexOf("rackId:") + "rackId:".length
+                //val endIndex = input.indexOf(",", startIndex)
+                //val rackIdValue = input.substring(startIndex, endIndex)
+                //val rackId = rackIdValue.toInt()
                 Log.d("Rak Code","Rak "+it.text)
-                val input = it.text
-                val startIndex = input.indexOf("rackId:") + "rackId:".length
-                val endIndex = input.indexOf(",", startIndex)
-                val rid = input.substring(startIndex, endIndex)
-                cekData(rid)
+                val jj = it.text
+                val jsonString = "{$jj"
+                try {
+                    // Buat objek JSON dari string JSON
+                    val jsonObject = JSONObject(jsonString)
+                    // Dapatkan nilai "itemNum" dan "id" dari objek JSON
+                    val rid = jsonObject.getString("rackId")
+                    cekData(rid)
+                    showSnack(this, "Scan result: ${rid}")
+                } catch (e: Exception) {
+                    // Tangani kesalahan jika parsing JSON gagal
+                    e.printStackTrace()
+                }
             }
         }
         codeScanner.errorCallback = ErrorCallback { // or ErrorCallback.SUPPRESS
