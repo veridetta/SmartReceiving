@@ -143,11 +143,11 @@ class AdminActivity : AppCompatActivity() {
         startActivity(intent)
     }
     private fun hapusBarang(barang: BarangModel) {
-        //dialog konfirmasi
+        // Dialog konfirmasi
         val builder = AlertDialog.Builder(this)
         builder.setMessage("Yakin ingin menghapus ${barang.nama}?")
         builder.setPositiveButton("Ya") { dialog, which ->
-            //hapus barang dari firestore
+            // Hapus barang dari Firestore
             progressDialog.show()
             val db = FirebaseFirestore.getInstance()
             db.collection("barang").document(barang.docId.toString())
@@ -167,7 +167,11 @@ class AdminActivity : AppCompatActivity() {
                     progressDialog.dismiss()
                 }
         }
+
+        // Menampilkan dialog konfirmasi
+        builder.create().show()
     }
+
     private fun initClick(){
         btnLogout.setOnClickListener {
             // Hapus shared preferences

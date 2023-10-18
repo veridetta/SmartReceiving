@@ -3,11 +3,11 @@ package com.vr.smartreceiving.activity.user
 import android.app.ProgressDialog
 import android.content.Intent
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
 import com.budiyev.android.codescanner.AutoFocusMode
 import com.budiyev.android.codescanner.CodeScanner
 import com.budiyev.android.codescanner.CodeScannerView
@@ -16,10 +16,7 @@ import com.budiyev.android.codescanner.ErrorCallback
 import com.budiyev.android.codescanner.ScanMode
 import com.google.firebase.firestore.FirebaseFirestore
 import com.vr.smartreceiving.R
-import com.vr.smartreceiving.activity.admin.AdminActivity
 import com.vr.smartreceiving.helper.showSnack
-import com.vr.smartreceiving.model.BarangModel
-import com.vr.smartreceiving.model.ReportDetailModel
 import com.vr.smartreceiving.model.ReportModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -65,17 +62,11 @@ class RakScanActivity : AppCompatActivity() {
             runOnUiThread {
                 showSnack(this, "Scan result: ${it.text}")
                 Log.d("Rak Code","Rak "+it.text)
-                val jsonString = it.text
-                try {
-                    // Buat objek JSON dari string JSON
-                    val jsonObject = JSONObject(jsonString)
-                    // Dapatkan nilai "itemNum" dan "id" dari objek JSON
-                    val rid = jsonObject.getString("rackId")
-                    cekData(rid)
-                } catch (e: Exception) {
-                    // Tangani kesalahan jika parsing JSON gagal
-                    e.printStackTrace()
-                }
+                val input = it.text
+                val startIndex = input.indexOf("rackId:") + "rackId:".length
+                val endIndex = input.indexOf(",", startIndex)
+                val rid = input.substring(startIndex, endIndex)
+                cekData(rid)
             }
         }
         codeScanner.errorCallback = ErrorCallback { // or ErrorCallback.SUPPRESS
