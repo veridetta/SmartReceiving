@@ -181,6 +181,8 @@ class BeforeScanActivity : AppCompatActivity() {
                     progressDialog.dismiss()
                 }
         }
+        // Menampilkan dialog konfirmasi
+        builder.create().show()
     }
     private fun initData(){
         readData()
