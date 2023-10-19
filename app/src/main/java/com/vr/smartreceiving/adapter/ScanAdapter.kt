@@ -76,6 +76,6 @@ class ScanAdapter(
         val tvItemNum: TextView = itemView.findViewById(R.id.tvItemNum)
         val tvItemNama: TextView = itemView.findViewById(R.id.tvItemNama)
         val tvScanAt: TextView = itemView.findViewById(R.id.tvScanAt)
-        val btnHapus: TextView = itemView.findViewById(R.id.btnHapus)
+        val btnHapus: LinearLayout = itemView.findViewById(R.id.btnHapus)
     }
 }
