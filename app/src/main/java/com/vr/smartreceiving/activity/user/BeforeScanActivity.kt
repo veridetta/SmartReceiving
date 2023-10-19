@@ -134,6 +134,7 @@ class BeforeScanActivity : AppCompatActivity() {
         rackId = intent.getStringExtra("rackId").toString()
         itemNama = intent.getStringExtra("itemNama").toString()
         rackDocId = intent.getStringExtra("rackDocId").toString()
+        Log.d("RAK", "BEFORE SCAN docId : ${rackDocId}")
     }
     private fun setIntent(){
         if (isRack=="true"){

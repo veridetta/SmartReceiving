@@ -88,6 +88,7 @@ class FirstScanActivity : AppCompatActivity() {
         type = intent.getStringExtra("type").toString()
         namaRack = intent.getStringExtra("namaRack").toString()
         rackDocId = intent.getStringExtra("rackDocId").toString()
+        Log.d("RAK", "FIRSTSCAN docId : ${rackDocId}")
     }
     override fun onResume() {
         super.onResume()

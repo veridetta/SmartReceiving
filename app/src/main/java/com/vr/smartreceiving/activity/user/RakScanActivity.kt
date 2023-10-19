@@ -133,6 +133,7 @@ class RakScanActivity : AppCompatActivity() {
                         )
                         intent.putExtra("rackId", reports[0].rakId.toString())
                         intent.putExtra("rackDocId", reports[0].docId.toString())
+                        Log.d("RAK", "RAKSCAN docId : ${reports[0].docId.toString()}")
                         intent.putExtra("namaRack", reports[0].nama.toString())
                         intent.putExtra("isRack", "true")
                         intent.putExtra("itemNama", reports[0].itemNama.toString())
