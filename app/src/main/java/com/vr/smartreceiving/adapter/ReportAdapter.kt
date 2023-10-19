@@ -9,6 +9,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.vr.smartreceiving.R
 import com.vr.smartreceiving.model.BarangModel
+import com.vr.smartreceiving.model.ReportDetailModel
 import com.vr.smartreceiving.model.ReportModel
 import java.util.Locale
 
@@ -16,6 +17,7 @@ import java.util.Locale
 class ReportAdapter(
     private var barangList: MutableList<ReportModel>,
     val context: Context,
+    private val onHapusClickListener: (ReportModel) -> Unit,
 ) : RecyclerView.Adapter<ReportAdapter.ProductViewHolder>() {
     public var filteredBarangList: MutableList<ReportModel> = mutableListOf()
     init {
@@ -59,7 +61,7 @@ class ReportAdapter(
     override fun onBindViewHolder(holder: ProductViewHolder, position: Int) {
         val currentBarang = filteredBarangList[position]
 
-        holder.tvNama.text = currentBarang.nama
+        holder.tvNama.text = "Rack : "+currentBarang.rakId
         var item = "Item ("+currentBarang.itemMerek+") "+currentBarang.itemNama
         if(currentBarang.itemJenis == ""){
             item += " - "+currentBarang.itemJenis
@@ -70,7 +72,8 @@ class ReportAdapter(
         holder.tvNomorPenerimaan.text = "Nomor Penerimaan "+currentBarang.nomorPenerimaan
         holder.tvJumlah.text = "Jumlah "+currentBarang.jumlah+" "+currentBarang.satuan
         holder.tvPetugas.text = "Petugas "+currentBarang.petugasNama
-        holder.tvScanAt.text = "Scan pada "+currentBarang.scanAt
+        holder.tvScanAt.text = "Scan pada "+currentBarang.createdAt
+        holder.btnHapus.setOnClickListener { onHapusClickListener(currentBarang) }
     }
 
     inner class ProductViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -80,5 +83,6 @@ class ReportAdapter(
         val tvJumlah: TextView = itemView.findViewById(R.id.tvJumlah)
         val tvPetugas: TextView = itemView.findViewById(R.id.tvPetugas)
         val tvScanAt: TextView = itemView.findViewById(R.id.tvScanAt)
+        val btnHapus: LinearLayout = itemView.findViewById(R.id.btnHapus)
     }
 }

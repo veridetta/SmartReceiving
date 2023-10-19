@@ -1,6 +1,8 @@
 package com.vr.smartreceiving.activity.admin
 
+import android.app.AlertDialog
 import android.app.ProgressDialog
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -11,8 +13,11 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.firestore.FirebaseFirestore
 import com.vr.smartreceiving.R
+import com.vr.smartreceiving.activity.user.BeforeScanActivity
 import com.vr.smartreceiving.adapter.ReportAdapter
 import com.vr.smartreceiving.adapter.ReportAdapterUser
+import com.vr.smartreceiving.helper.showSnack
+import com.vr.smartreceiving.model.ReportDetailModel
 import com.vr.smartreceiving.model.ReportModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -56,7 +61,7 @@ class ReportActivity : AppCompatActivity() {
             reportAdapter = ReportAdapter(
                 reportList,
                 this@ReportActivity
-            )
+            ){ report -> hapusBarang(report) }
         }
     }
     private fun initData(){
@@ -96,4 +101,57 @@ class ReportActivity : AppCompatActivity() {
             finish()
         }
     }
+    private fun hapusBarang(report: ReportModel) {
+        // Dialog konfirmasi
+        val builder = AlertDialog.Builder(this)
+        builder.setMessage("Yakin ingin menghapus ${report.nama}?")
+        builder.setPositiveButton("Ya") { dialog, which ->
+            progressDialog.show()
+            val db = FirebaseFirestore.getInstance()
+
+            // Ambil rakId dari report yang akan dihapus
+            val rakId = report.rakId
+
+            // Hapus data dari "reportDetail" dengan kunci "rakId"
+            db.collection("reportDetail")
+                .whereEqualTo("rakId", rakId)
+                .get()
+                .addOnSuccessListener { querySnapshot ->
+                    for (document in querySnapshot.documents) {
+                        db.collection("reportDetail").document(document.id)
+                            .delete()
+                            .addOnFailureListener { e ->
+                                Log.w(TAG, "Error deleting reportDetail: $e")
+                            }
+                    }
+
+                    // Setelah semua data "reportDetail" terhapus, baru hapus data "report"
+                    db.collection("report").document(report.docId.toString())
+                        .delete()
+                        .addOnSuccessListener {
+                            showSnack(this, "Berhasil menghapus rak dan datanya")
+                            progressDialog.dismiss()
+
+                            // Redirect to BeforeScanActivity
+                            val intent = Intent(this, BeforeScanActivity::class.java)
+                            startActivity(intent)
+                            finish()
+                        }
+                        .addOnFailureListener { e ->
+                            // Error occurred while deleting "report"
+                            Log.w(TAG, "Error deleting report: $e")
+                            progressDialog.dismiss()
+                        }
+                }
+                .addOnFailureListener { e ->
+                    // Error occurred while fetching "reportDetail" data
+                    Log.w(TAG, "Error fetching reportDetail data: $e")
+                    progressDialog.dismiss()
+                }
+        }
+
+        // Menampilkan dialog konfirmasi
+        builder.create().show()
+    }
+
 }

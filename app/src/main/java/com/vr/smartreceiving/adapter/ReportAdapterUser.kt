@@ -59,7 +59,7 @@ class ReportAdapterUser(
     override fun onBindViewHolder(holder: ProductViewHolder, position: Int) {
         val currentBarang = filteredBarangList[position]
 
-        holder.tvNama.text = currentBarang.nama
+        holder.tvNama.text = "Rack : "+currentBarang.rakId
         var item = "Item ("+currentBarang.itemMerek+") "+currentBarang.itemNama
         if(currentBarang.itemJenis == ""){
             item += " - "+currentBarang.itemJenis
@@ -70,7 +70,7 @@ class ReportAdapterUser(
         holder.tvNomorPenerimaan.text = "Nomor Penerimaan "+currentBarang.nomorPenerimaan
         holder.tvJumlah.text = "Jumlah "+currentBarang.jumlah+" "+currentBarang.satuan
         holder.tvPetugas.text = "Petugas "+currentBarang.petugasNama
-        holder.tvScanAt.text = "Scan pada "+currentBarang.scanAt
+        holder.tvScanAt.text = "Scan pada "+currentBarang.createdAt
     }
 
     inner class ProductViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

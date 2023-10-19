@@ -138,7 +138,7 @@ class BeforeScanActivity : AppCompatActivity() {
     }
     private fun setIntent(){
         if (isRack=="true"){
-            tvRack.text = namaRack
+            tvRack.text = "Rack : "+rackId
         }
     }
     private fun initRc(){
@@ -173,8 +173,6 @@ class BeforeScanActivity : AppCompatActivity() {
                     intent.putExtra("type",type)
                     startActivity(intent)
                     finish()
-                    startActivity(intent)
-                    finish()
                 }
                 .addOnFailureListener { e ->
                     // Error occurred while adding product
@@ -192,13 +190,13 @@ class BeforeScanActivity : AppCompatActivity() {
     }
     private fun readData(){
         progressDialog.show()
+        var jumlah = 0
+        var satuan = ""
         GlobalScope.launch(Dispatchers.IO) {
             try {
                 val result = mFirestore.collection("reportDetail").whereEqualTo("rakId",rackId)
                     .get().await()
                 val reports = mutableListOf<ReportDetailModel>()
-                var jumlah = 0
-                var satuan = ""
                 for (document in result) {
                     val report = document.toObject(ReportDetailModel::class.java)
                     val docId = document.id
@@ -209,12 +207,14 @@ class BeforeScanActivity : AppCompatActivity() {
                 }
 
                 withContext(Dispatchers.Main) {
-                    if(jumlah.equals(maxItem)){
-                        lengkap=true
-                    }
                     satuan = reports[0].satuan.toString()
                     itemNama = reports[0].itemNama.toString()
                     maxItem = reports[0].perRak.toString()
+                    Log.d("PER RAK",maxItem)
+                    Log.d("PER RAK Jumlah",maxItem)
+                    if(jumlah == maxItem.toInt()){
+                        lengkap=true
+                    }
                     var itemz = "("+reports[0].itemMerek+") "+reports[0].itemNama
                     if(reports[0].itemJenis == ""){
                         itemz += " - "+reports[0].itemJenis
@@ -243,7 +243,7 @@ class BeforeScanActivity : AppCompatActivity() {
         )
         val db = FirebaseFirestore.getInstance()
         db.collection("report")
-            .document(rackId)
+            .document(rackDocId)
             .update(barangData as Map<String, Any>)
             .addOnSuccessListener { documentReference ->
                 showSnack(this,"Berhasil menyimpan barang")

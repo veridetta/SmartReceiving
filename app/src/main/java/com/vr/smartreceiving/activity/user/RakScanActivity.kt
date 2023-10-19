@@ -138,6 +138,9 @@ class RakScanActivity : AppCompatActivity() {
                         intent.putExtra("isRack", "true")
                         intent.putExtra("itemNama", reports[0].itemNama.toString())
                         intent.putExtra("type", type)
+                        if(reports[0].nama.toString()!=="" && reports[0].rakId.toString()==rid){
+
+                        }
                         startActivity(intent)
                         finish()
                     } else {
@@ -185,6 +188,7 @@ class RakScanActivity : AppCompatActivity() {
                                 intent.putExtra("rackId", rid)
                                 intent.putExtra("namaRack", nama)
                                 intent.putExtra("isRack", "true")
+                                intent.putExtra("rackDocId", documentReference.id)
                                 intent.putExtra("itemNama", "")
                                 intent.putExtra("type", type)
                                 startActivity(intent)
