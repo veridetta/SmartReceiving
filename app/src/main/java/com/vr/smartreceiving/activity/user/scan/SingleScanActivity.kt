@@ -216,7 +216,7 @@ class SingleScanActivity : AppCompatActivity() {
                                     "uid" to UUID.randomUUID().toString(),
                                     "nama" to nama,
                                     "perRak" to reports[0].perRak.toString(),
-                                    "rackId" to rackId,
+                                    "rakId" to rackId,
                                     "itemId" to itemId,
                                     "itemNama" to reports[0].nama.toString(),
                                     "nomorPenerimaan" to nomorPenerimaan,
