@@ -198,6 +198,7 @@ class SingleScanActivity : AppCompatActivity() {
                                                 intent.putExtra("aksi","reload")
                                                 intent.putExtra("rackDocId",rackDocId)
                                                 intent.putExtra("type",type)
+                                                intent.putExtra("isRack", "true")
                                                 startActivity(intent)
                                                 finish()
                                             }
@@ -242,6 +243,7 @@ class SingleScanActivity : AppCompatActivity() {
                                         intent.putExtra("namaRack",nama)
                                         intent.putExtra("rackDocId",rackDocId)
                                         intent.putExtra("type",type)
+                                        intent.putExtra("isRack", "true")
                                         startActivity(intent)
                                         finish()
                                     }
