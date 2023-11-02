@@ -47,6 +47,7 @@ class AddActivity : AppCompatActivity() {
     private var scanAt = ""
     private var editAt = ""
     private var createdAt = ""
+
     lateinit var progressDialog: ProgressDialog
 
     @RequiresApi(Build.VERSION_CODES.O)

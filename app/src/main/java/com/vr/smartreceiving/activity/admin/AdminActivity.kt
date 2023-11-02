@@ -31,6 +31,7 @@ import kotlinx.coroutines.withContext
 
 class AdminActivity : AppCompatActivity() {
     private lateinit var plantAdapter: BarangAdapter
+
     private lateinit var recyclerView: RecyclerView
     private lateinit var contentView: RelativeLayout
     private lateinit var searchLayout: LinearLayout
@@ -40,7 +41,8 @@ class AdminActivity : AppCompatActivity() {
     private lateinit var btnUser: CardView
     private lateinit var btnReport: CardView
     private lateinit var progressDialog: ProgressDialog
-    val TAG = "LOAD DATA"
+
+    val TAG = "LOAD DATA AdminActvy"
     private val plantList: MutableList<BarangModel> = mutableListOf()
     lateinit var mFirestore: FirebaseFirestore
 
@@ -55,6 +57,7 @@ class AdminActivity : AppCompatActivity() {
     }
     private fun initView(){
         mFirestore = FirebaseFirestore.getInstance()
+
         recyclerView = findViewById(R.id.rcBarang)
         contentView = findViewById(R.id.contentView)
         searchLayout = findViewById(R.id.searchLayout)

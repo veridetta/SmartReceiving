@@ -94,7 +94,7 @@ class BeforeScanActivity : AppCompatActivity() {
                 if (isRack=="false"){
                     showSnack(this,"Scan rack terlebih dahulu")
                 }else{
-                    if(type=="HGP" || type=="FDR"){
+                    if(type=="FDR"){
                         val intent = Intent(this, FirstScanActivity::class.java)
                         intent.putExtra("rackId",rackId)
                         intent.putExtra("itemNama",itemNama)

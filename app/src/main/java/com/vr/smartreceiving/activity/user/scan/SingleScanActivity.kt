@@ -2,10 +2,12 @@ package com.vr.smartreceiving.activity.user.scan
 
 import android.app.ProgressDialog
 import android.content.Intent
+import android.media.MediaPlayer
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import com.budiyev.android.codescanner.AutoFocusMode
@@ -40,30 +42,51 @@ class SingleScanActivity : AppCompatActivity() {
     var rackDocId=""
     var type=""
     var kode1=""
+    var total =1
+    var scanned = 0
     private lateinit var codeScanner: CodeScanner
     private lateinit var scannerView: CodeScannerView
+    private lateinit var btnSelesai: LinearLayout
     private lateinit var progressDialog : ProgressDialog
+    private var mediaPlayer: MediaPlayer? = null
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_single_scan)
         initView()
         initIntent()
+        onClick()
         initCodeScanner()
     }
     private fun initView(){
         scannerView = findViewById<CodeScannerView>(R.id.scanner_view)
         codeScanner = CodeScanner(this, scannerView)
+        btnSelesai = findViewById(R.id.btnSelesai)
         progressDialog = ProgressDialog(this)
         progressDialog.setMessage("Loading...")
         progressDialog.setCancelable(false)
+        // Inisialisasi MediaPlayer
+        mediaPlayer = MediaPlayer.create(this, R.raw.sound)
+    }
+    private fun onClick(){
+        btnSelesai.setOnClickListener {
+            val intent = Intent(this@SingleScanActivity, BeforeScanActivity::class.java)
+            intent.putExtra("rackId",rackId)
+            intent.putExtra("namaRack",namaRack)
+            intent.putExtra("aksi","reload")
+            intent.putExtra("rackDocId",rackDocId)
+            intent.putExtra("type",type)
+            intent.putExtra("isRack", "true")
+            startActivity(intent)
+            finish()
+        }
     }
     @RequiresApi(Build.VERSION_CODES.O)
     private fun initCodeScanner(){
         codeScanner.camera = CodeScanner.CAMERA_BACK
         codeScanner.formats = CodeScanner.ALL_FORMATS // list of type BarcodeFormat,
         codeScanner.autoFocusMode = AutoFocusMode.SAFE // or CONTINUOUS
-        codeScanner.scanMode = ScanMode.SINGLE // or CONTINUOUS or PREVIEW
+        codeScanner.scanMode = ScanMode.CONTINUOUS // or CONTINUOUS or PREVIEW
         codeScanner.isAutoFocusEnabled = true // Whether to enable auto focus or not
         codeScanner.isFlashEnabled = false // Whether to enable flash or not
         codeScanner.decodeCallback = DecodeCallback {
@@ -76,7 +99,11 @@ class SingleScanActivity : AppCompatActivity() {
                     // Dapatkan nilai "itemNum" dan "id" dari objek JSON
                     kode1 = jsonObject.getString("itemNum")
                     val id = jsonObject.getString("id")
-                    cekDuplicate(id)
+                    if(scanned >= total){
+                        showSnack(this, "Item sudah di maksimal")
+                    }else{
+                        cekDuplicate(id)
+                    }
                 } catch (e: Exception) {
                     // Tangani kesalahan jika parsing JSON gagal
                     e.printStackTrace()
@@ -108,6 +135,10 @@ class SingleScanActivity : AppCompatActivity() {
     override fun onPause() {
         codeScanner.releaseResources()
         super.onPause()
+    }
+    override fun onDestroy() {
+        super.onDestroy()
+        mediaPlayer?.release()
     }
     @RequiresApi(Build.VERSION_CODES.O)
     private fun readData(itemId:String) {
@@ -192,15 +223,13 @@ class SingleScanActivity : AppCompatActivity() {
                                             .add(barangData2 as Map<String, Any>)
                                             .addOnSuccessListener { documentReferencex ->
                                                 showSnack(this@SingleScanActivity,"Berhasil menyimpan barang")
-                                                val intent = Intent(this@SingleScanActivity, BeforeScanActivity::class.java)
-                                                intent.putExtra("rackId",rackId)
-                                                intent.putExtra("namaRack",namaRack)
-                                                intent.putExtra("aksi","reload")
-                                                intent.putExtra("rackDocId",rackDocId)
-                                                intent.putExtra("type",type)
-                                                intent.putExtra("isRack", "true")
-                                                startActivity(intent)
-                                                finish()
+                                                if (mediaPlayer != null && !mediaPlayer!!.isPlaying) {
+                                                    // Cek apakah MediaPlayer sedang memainkan suara. Jika tidak, mainkan suara.
+                                                    mediaPlayer?.start()
+                                                }
+                                                total = reports[0].perRak!!.toInt()
+                                                scanned = scanned + 1
+
                                             }
                                             .addOnFailureListener { e ->
                                                 // Error occurred while adding product
@@ -236,16 +265,12 @@ class SingleScanActivity : AppCompatActivity() {
                                     .add(barangData2 as Map<String, Any>)
                                     .addOnSuccessListener { documentReferencex ->
                                         showSnack(this@SingleScanActivity,"Berhasil menyimpan barang")
-                                        // Redirect to SellerActivity fragment home
-                                        // Redirect to SellerActivity fragment home
-                                        val intent = Intent(this@SingleScanActivity, BeforeScanActivity::class.java)
-                                        intent.putExtra("rackId",rackId)
-                                        intent.putExtra("namaRack",nama)
-                                        intent.putExtra("rackDocId",rackDocId)
-                                        intent.putExtra("type",type)
-                                        intent.putExtra("isRack", "true")
-                                        startActivity(intent)
-                                        finish()
+                                        if (mediaPlayer != null && !mediaPlayer!!.isPlaying) {
+                                            // Cek apakah MediaPlayer sedang memainkan suara. Jika tidak, mainkan suara.
+                                            mediaPlayer?.start()
+                                        }
+                                        total = reports[0].perRak!!.toInt()
+                                        scanned = scanned + 1
                                     }
                                     .addOnFailureListener { e ->
                                         // Error occurred while adding product
