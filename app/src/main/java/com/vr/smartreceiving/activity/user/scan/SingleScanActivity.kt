@@ -42,7 +42,8 @@ class SingleScanActivity : AppCompatActivity() {
     var rackDocId=""
     var type=""
     var kode1=""
-    var total =1
+    var total =2
+    var status = true
     var scanned = 0
     private lateinit var codeScanner: CodeScanner
     private lateinit var scannerView: CodeScannerView
@@ -99,10 +100,15 @@ class SingleScanActivity : AppCompatActivity() {
                     // Dapatkan nilai "itemNum" dan "id" dari objek JSON
                     kode1 = jsonObject.getString("itemNum")
                     val id = jsonObject.getString("id")
-                    if(scanned >= total){
-                        showSnack(this, "Item sudah di maksimal")
+                    if(status){
+                        if(scanned >= total){
+                            showSnack(this, "Item sudah di maksimal")
+                        }else{
+                            status=false
+                            cekDuplicate(id)
+                        }
                     }else{
-                        cekDuplicate(id)
+                        showSnack(this, "Masih mengirim data..")
                     }
                 } catch (e: Exception) {
                     // Tangani kesalahan jika parsing JSON gagal
@@ -157,7 +163,8 @@ class SingleScanActivity : AppCompatActivity() {
                     report.docId = docId
                     reports.add(report)
                     Log.d("SCN", "Datanya : ${document.id} => ${document.data}")
-                     ada = true
+                    ada = true
+                    total = reports[0].perRak!!.toInt()
                     if (itemNama =="" ){
                         beda=false
                     }else{
@@ -173,6 +180,7 @@ class SingleScanActivity : AppCompatActivity() {
                     if(ada){
                         if(beda){
                             showSnack(this@SingleScanActivity, "Data tidak sesuai")
+                            status=true
                         }else{
                             //simpan data ke report firebase
                             val currentDateTime = LocalDateTime.now()
@@ -195,87 +203,100 @@ class SingleScanActivity : AppCompatActivity() {
                                     "itemUid" to reports[0].uid.toString(),
                                 )
                                 val db = FirebaseFirestore.getInstance()
-                                val reportCollection = db.collection("report")
-                                reportCollection.document(rackDocId).update(barangData as Map<String, Any>)
-                                    .addOnSuccessListener { documentReference ->
-                                        showSnack(this@SingleScanActivity, "Berhasil memperbarui barang")
-                                        val barangData2 = hashMapOf(
-                                            "uid" to UUID.randomUUID().toString(),
-                                            "nama" to namaRack,
-                                            "perRak" to reports[0].perRak.toString(),
-                                            "rakId" to rackId,
-                                            "itemId" to itemId,
-                                            "itemNama" to reports[0].nama.toString(),
-                                            "nomorPenerimaan" to nomorPenerimaan,
-                                            "itemUid" to reports[0].uid.toString(),
-                                            "itemMerek" to reports[0].merek.toString(),
-                                            "itemNum" to kode1,
-                                            "itemJenis" to reports[0].jenis.toString(),
-                                            "satuan" to reports[0].satuan.toString(),
-                                            "petugasUid" to petugasUid,
-                                            "petugasNama" to petugasNama,
-                                            "createdAt" to createdAt,
-                                            "scanAt" to createdAt
-                                        )
-                                        val db2 = FirebaseFirestore.getInstance()
-                                        // Add the product data to Firestore
-                                        db2.collection("reportDetail")
-                                            .add(barangData2 as Map<String, Any>)
-                                            .addOnSuccessListener { documentReferencex ->
-                                                showSnack(this@SingleScanActivity,"Berhasil menyimpan barang")
-                                                if (mediaPlayer != null && !mediaPlayer!!.isPlaying) {
-                                                    // Cek apakah MediaPlayer sedang memainkan suara. Jika tidak, mainkan suara.
-                                                    mediaPlayer?.start()
-                                                }
-                                                total = reports[0].perRak!!.toInt()
-                                                scanned = scanned + 1
+                                if(scanned >= total){
+                                    status=true
+                                    showSnack(this@SingleScanActivity, "Item sudah di maksimal")
+                                }else{
+                                    val reportCollection = db.collection("report")
+                                    reportCollection.document(rackDocId).update(barangData as Map<String, Any>)
+                                        .addOnSuccessListener { documentReference ->
+                                            showSnack(this@SingleScanActivity, "Berhasil memperbarui barang")
+                                            val barangData2 = hashMapOf(
+                                                "uid" to UUID.randomUUID().toString(),
+                                                "nama" to namaRack,
+                                                "perRak" to reports[0].perRak.toString(),
+                                                "rakId" to rackId,
+                                                "itemId" to itemId,
+                                                "itemNama" to reports[0].nama.toString(),
+                                                "nomorPenerimaan" to nomorPenerimaan,
+                                                "itemUid" to reports[0].uid.toString(),
+                                                "itemMerek" to reports[0].merek.toString(),
+                                                "itemNum" to kode1,
+                                                "itemJenis" to reports[0].jenis.toString(),
+                                                "satuan" to reports[0].satuan.toString(),
+                                                "petugasUid" to petugasUid,
+                                                "petugasNama" to petugasNama,
+                                                "createdAt" to createdAt,
+                                                "scanAt" to createdAt
+                                            )
+                                            val db2 = FirebaseFirestore.getInstance()
+                                            // Add the product data to Firestore
+                                            db2.collection("reportDetail")
+                                                .add(barangData2 as Map<String, Any>)
+                                                .addOnSuccessListener { documentReferencex ->
+                                                    showSnack(this@SingleScanActivity,"Berhasil menyimpan barang {$scanned}/{$total}")
+                                                    if (mediaPlayer != null && !mediaPlayer!!.isPlaying) {
+                                                        // Cek apakah MediaPlayer sedang memainkan suara. Jika tidak, mainkan suara.
+                                                        mediaPlayer?.start()
+                                                    }
+                                                    scanned += 1
+                                                    status=true
 
-                                            }
-                                            .addOnFailureListener { e ->
-                                                // Error occurred while adding product
-                                                showSnack(this@SingleScanActivity,"Gagal menyimpan barang ${e.message}")
-                                            }
-                                    }
-                                    .addOnFailureListener { e ->
-                                        // Error occurred while adding product
-                                        showSnack(this@SingleScanActivity,"Gagal menyimpan barang ${e.message}")
-                                    }
-                            }else{
-                                val barangData2 = hashMapOf(
-                                    "uid" to UUID.randomUUID().toString(),
-                                    "nama" to nama,
-                                    "perRak" to reports[0].perRak.toString(),
-                                    "rakId" to rackId,
-                                    "itemId" to itemId,
-                                    "itemNama" to reports[0].nama.toString(),
-                                    "nomorPenerimaan" to nomorPenerimaan,
-                                    "itemUid" to reports[0].uid.toString(),
-                                    "itemMerek" to reports[0].merek.toString(),
-                                    "itemNum" to kode1,
-                                    "itemJenis" to reports[0].jenis.toString(),
-                                    "satuan" to reports[0].satuan.toString(),
-                                    "petugasUid" to petugasUid,
-                                    "petugasNama" to petugasNama,
-                                    "createdAt" to createdAt,
-                                    "scanAt" to createdAt
-                                )
-                                val db2 = FirebaseFirestore.getInstance()
-                                // Add the product data to Firestore
-                                db2.collection("reportDetail")
-                                    .add(barangData2 as Map<String, Any>)
-                                    .addOnSuccessListener { documentReferencex ->
-                                        showSnack(this@SingleScanActivity,"Berhasil menyimpan barang")
-                                        if (mediaPlayer != null && !mediaPlayer!!.isPlaying) {
-                                            // Cek apakah MediaPlayer sedang memainkan suara. Jika tidak, mainkan suara.
-                                            mediaPlayer?.start()
+                                                }
+                                                .addOnFailureListener { e ->
+                                                    // Error occurred while adding product
+                                                    status=true
+                                                    showSnack(this@SingleScanActivity,"Gagal menyimpan barang ${e.message}")
+                                                }
                                         }
-                                        total = reports[0].perRak!!.toInt()
-                                        scanned = scanned + 1
-                                    }
-                                    .addOnFailureListener { e ->
-                                        // Error occurred while adding product
-                                        showSnack(this@SingleScanActivity,"Gagal menyimpan barang ${e.message}")
-                                    }
+                                        .addOnFailureListener { e ->
+                                            // Error occurred while adding product
+                                            status=true
+                                            showSnack(this@SingleScanActivity,"Gagal menyimpan barang ${e.message}")
+                                        }
+                                }
+
+                            }else{
+                                if(scanned >= total){
+                                    showSnack(this@SingleScanActivity, "Item sudah di maksimal")
+
+                                }else {
+                                    val barangData2 = hashMapOf(
+                                        "uid" to UUID.randomUUID().toString(),
+                                        "nama" to nama,
+                                        "perRak" to reports[0].perRak.toString(),
+                                        "rakId" to rackId,
+                                        "itemId" to itemId,
+                                        "itemNama" to reports[0].nama.toString(),
+                                        "nomorPenerimaan" to nomorPenerimaan,
+                                        "itemUid" to reports[0].uid.toString(),
+                                        "itemMerek" to reports[0].merek.toString(),
+                                        "itemNum" to kode1,
+                                        "itemJenis" to reports[0].jenis.toString(),
+                                        "satuan" to reports[0].satuan.toString(),
+                                        "petugasUid" to petugasUid,
+                                        "petugasNama" to petugasNama,
+                                        "createdAt" to createdAt,
+                                        "scanAt" to createdAt
+                                    )
+                                    val db2 = FirebaseFirestore.getInstance()
+                                    // Add the product data to Firestore
+                                    db2.collection("reportDetail")
+                                        .add(barangData2 as Map<String, Any>)
+                                        .addOnSuccessListener { documentReferencex ->
+                                            showSnack(this@SingleScanActivity,"Berhasil menyimpan barang {$scanned}/{$total}")
+                                            if (mediaPlayer != null && !mediaPlayer!!.isPlaying) {
+                                                // Cek apakah MediaPlayer sedang memainkan suara. Jika tidak, mainkan suara.
+                                                mediaPlayer?.start()
+                                            }
+                                            scanned += 1
+                                            status=true
+                                        }
+                                        .addOnFailureListener { e ->
+                                            // Error occurred while adding product
+                                            showSnack(this@SingleScanActivity,"Gagal menyimpan barang ${e.message}")
+                                        }
+                                }
                             }
                             progressDialog.dismiss()
                         }
@@ -306,6 +327,7 @@ class SingleScanActivity : AppCompatActivity() {
                 withContext(Dispatchers.Main) {
                     progressDialog.dismiss()
                     if(duplicate){
+                        status=true
                         showSnack(this@SingleScanActivity, "Item sudah di scan")
                         codeScanner.startPreview()
                     }else{
@@ -313,6 +335,7 @@ class SingleScanActivity : AppCompatActivity() {
                     }
                 }
             } catch (e: Exception) {
+                status=true
                 Log.w("SCAN", "Error getting documents : $e")
                 progressDialog.dismiss()
             }
