@@ -7,13 +7,9 @@ import android.os.Handler
 import android.os.Looper
 import android.widget.ProgressBar
 import android.widget.TextView
-import com.google.firebase.appcheck.debug.DebugAppCheckProviderFactory
-import com.google.firebase.appcheck.ktx.appCheck
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.ktx.initialize
+import androidx.room.Room
 import com.vr.smartreceiving.activity.LoginActivity
-import com.vr.smartreceiving.activity.admin.AdminActivity
-import com.vr.smartreceiving.activity.user.UserActivity
+import com.vr.smartreceiving.db.AppDatabase
 
 class SplashActivity : AppCompatActivity() {
     private var progressBar: ProgressBar? = null
@@ -34,10 +30,10 @@ class SplashActivity : AppCompatActivity() {
         val sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE)
         val isLoggedIn = sharedPreferences.getBoolean("isLogin", false)
         // Initialize Firebase
-        Firebase.initialize(context = this)
-        Firebase.appCheck.installAppCheckProviderFactory(
-            DebugAppCheckProviderFactory.getInstance(),
-        )
+        val db = Room.databaseBuilder(
+            applicationContext,
+            AppDatabase::class.java, "receiving-db"
+        ).build()
         Handler(Looper.getMainLooper()).postDelayed({
             checkUserLogin()
         }, 1000) // Jeda selama 1 detik
@@ -63,20 +59,11 @@ class SplashActivity : AppCompatActivity() {
             isLoggedIn -> {
                 //cek token firebase
                 when (userRole) {
-                    "admin" -> AdminActivity::class.java
-                    "user" -> UserActivity::class.java
+                    "admin" -> MainActivity::class.java
                     else -> LoginActivity::class.java // Handle unknown roles
                 }
             }
             else -> LoginActivity::class.java
-        }
-        //jika berhasil login maka update token
-        if (isLoggedIn) {
-            //cek jika token kosong maka update token
-            val tokken = sharedPreferences.getString("token", "")
-            if (tokken.isNullOrEmpty()) {
-                val uid = sharedPreferences.getString("userUid", "")
-            }
         }
         startActivity(Intent(this@SplashActivity, targetActivity))
         finish()

@@ -21,43 +21,13 @@
         android:theme="@style/Theme.SmartReceiving"
         tools:targetApi="31">
         <activity
-            android:name=".activity.user.scan.SecondScanActivity"
-            android:exported="false" />
-        <activity
-            android:name=".activity.user.scan.FirstScanActivity"
-            android:exported="false" />
-        <activity
-            android:name=".activity.user.scan.SingleScanActivity"
-            android:exported="false" />
-        <activity
-            android:name=".activity.user.RakScanActivity"
-            android:exported="false" />
-        <activity
-            android:name=".activity.user.BeforeScanActivity"
-            android:exported="false" />
-        <activity
-            android:name=".activity.user.ReportActivityUser"
-            android:exported="false" />
-        <activity
-            android:name=".activity.admin.AddUserActivity"
-            android:exported="false" />
-        <activity
-            android:name=".activity.admin.ListUserActivity"
-            android:exported="false" />
-        <activity
-            android:name=".activity.user.ScanActivity"
-            android:exported="false" />
-        <activity
-            android:name=".activity.user.UserActivity"
-            android:exported="false" />
-        <activity
-            android:name=".activity.admin.ReportActivity"
+            android:name=".activity.admin.ScanActivity"
             android:exported="false" />
         <activity
             android:name=".activity.admin.AddActivity"
             android:exported="false" />
         <activity
-            android:name=".activity.admin.AdminActivity"
+            android:name=".activity.admin.BarangActivity"
             android:exported="false" />
         <activity
             android:name=".activity.LoginActivity"

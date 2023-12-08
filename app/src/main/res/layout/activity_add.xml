@@ -76,74 +76,6 @@
 
                                         android:layout_marginRight="@dimen/_5sdp"/>
 
-                                    <androidx.appcompat.widget.AppCompatSpinner
-                                        android:id="@+id/spMerek"
-                                        android:layout_width="0dp"
-                                        android:layout_height="@dimen/_40sdp"
-                                        android:layout_weight="1"
-                                        android:spinnerMode="dialog"
-                                        android:layout_gravity="center_vertical"
-                                        android:background="@null" />
-
-                                </LinearLayout>
-                            </com.google.android.material.textfield.TextInputLayout>
-                            <com.google.android.material.textfield.TextInputLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="16dp"
-                                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-                                <LinearLayout
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:background="@drawable/bg_rounded"
-                                    android:backgroundTint="@color/primaryColorLight"
-                                    android:gravity="center_vertical"
-                                    android:orientation="horizontal">
-
-                                    <ImageView
-                                        android:layout_width="@dimen/_25sdp"
-                                        android:layout_height="@dimen/_25sdp"
-                                        android:src="@drawable/ic_item"
-                                        app:tint="@color/primaryColorDark"
-                                        android:layout_margin="@dimen/_4sdp"
-                                        android:layout_gravity="center_vertical"
-
-                                        android:layout_marginRight="@dimen/_5sdp"/>
-
-                                    <androidx.appcompat.widget.AppCompatSpinner
-                                        android:id="@+id/spJenis"
-                                        android:layout_width="0dp"
-                                        android:layout_height="@dimen/_40sdp"
-                                        android:layout_weight="1"
-                                        android:spinnerMode="dialog"
-                                        android:layout_gravity="center_vertical"
-                                        android:background="@null" />
-
-                                </LinearLayout>
-                            </com.google.android.material.textfield.TextInputLayout>
-                            <com.google.android.material.textfield.TextInputLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="16dp"
-                                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-                                <LinearLayout
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:background="@drawable/bg_rounded"
-                                    android:backgroundTint="@color/primaryColorLight"
-                                    android:gravity="center_vertical"
-                                    android:orientation="horizontal">
-
-                                    <ImageView
-                                        android:layout_width="@dimen/_25sdp"
-                                        android:layout_height="@dimen/_25sdp"
-                                        android:src="@drawable/ic_item"
-                                        app:tint="@color/primaryColorDark"
-                                        android:layout_margin="@dimen/_4sdp"
-                                        android:layout_gravity="center_vertical"
-
-                                        android:layout_marginRight="@dimen/_5sdp"/>
-
                                     <com.google.android.material.textfield.TextInputEditText
                                         android:id="@+id/etNama"
                                         android:layout_width="0dp"
@@ -171,7 +103,7 @@
                                     <ImageView
                                         android:layout_width="@dimen/_25sdp"
                                         android:layout_height="@dimen/_25sdp"
-                                        android:src="@drawable/ic_unit"
+                                        android:src="@drawable/ic_qr"
                                         app:tint="@color/primaryColorDark"
                                         android:layout_margin="@dimen/_4sdp"
                                         android:layout_gravity="center_vertical"
@@ -179,11 +111,11 @@
                                         android:layout_marginRight="@dimen/_5sdp"/>
 
                                     <com.google.android.material.textfield.TextInputEditText
-                                        android:id="@+id/etSatuan"
+                                        android:id="@+id/etKode"
                                         android:layout_width="0dp"
                                         android:layout_height="wrap_content"
                                         android:layout_weight="1"
-                                        android:hint="Satuan"
+                                        android:hint="QR CODE"
                                         android:inputType="text"
                                         android:background="@null" />
 
@@ -213,84 +145,17 @@
                                         android:layout_marginRight="@dimen/_5sdp"/>
 
                                     <com.google.android.material.textfield.TextInputEditText
-                                        android:id="@+id/etPerRak"
+                                        android:id="@+id/etGroup"
                                         android:layout_width="0dp"
                                         android:layout_height="wrap_content"
                                         android:layout_weight="1"
-                                        android:hint="Jumlah Per Rak"
+                                        android:hint="Nama Grup"
                                         android:inputType="number"
                                         android:background="@null" />
 
                                 </LinearLayout>
                             </com.google.android.material.textfield.TextInputLayout>
-                            <com.google.android.material.textfield.TextInputLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="16dp"
-                                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-                                <LinearLayout
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:background="@drawable/bg_rounded"
-                                    android:backgroundTint="@color/primaryColorLight"
-                                    android:gravity="center_vertical"
-                                    android:orientation="horizontal">
 
-                                    <ImageView
-                                        android:layout_width="@dimen/_25sdp"
-                                        android:layout_height="@dimen/_25sdp"
-                                        android:src="@drawable/ic_qr"
-                                        app:tint="@color/primaryColorDark"
-                                        android:layout_margin="@dimen/_4sdp"
-                                        android:layout_gravity="center_vertical"
-
-                                        android:layout_marginRight="@dimen/_5sdp"/>
-
-                                    <com.google.android.material.textfield.TextInputEditText
-                                        android:id="@+id/etQr1"
-                                        android:layout_width="0dp"
-                                        android:layout_height="wrap_content"
-                                        android:layout_weight="1"
-                                        android:hint="QR/BAR CODE 1"
-                                        android:inputType="text"
-                                        android:background="@null" />
-
-                                </LinearLayout>
-                            </com.google.android.material.textfield.TextInputLayout>
-                            <com.google.android.material.textfield.TextInputLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="16dp"
-                                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-                                <LinearLayout
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:background="@drawable/bg_rounded"
-                                    android:backgroundTint="@color/primaryColorLight"
-                                    android:gravity="center_vertical"
-                                    android:orientation="horizontal">
-
-                                    <ImageView
-                                        android:layout_width="@dimen/_25sdp"
-                                        android:layout_height="@dimen/_25sdp"
-                                        android:src="@drawable/ic_qr"
-                                        app:tint="@color/primaryColorDark"
-                                        android:layout_margin="@dimen/_4sdp"
-                                        android:layout_gravity="center_vertical"
-
-                                        android:layout_marginRight="@dimen/_5sdp"/>
-
-                                    <com.google.android.material.textfield.TextInputEditText
-                                        android:id="@+id/etQr2"
-                                        android:layout_width="0dp"
-                                        android:layout_height="wrap_content"
-                                        android:layout_weight="1"
-                                        android:hint="QR/BAR CODE 2 (OPTIONAL)"
-                                        android:inputType="text"
-                                        android:background="@null" />
-
-                                </LinearLayout>
-                            </com.google.android.material.textfield.TextInputLayout>
                             <androidx.appcompat.widget.AppCompatButton
                                 android:id="@+id/btnSimpan"
                                 android:layout_width="match_parent"

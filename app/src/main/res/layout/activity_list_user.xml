@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:id="@+id/contentView"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".activity.admin.AdminActivity">
+    tools:context=".activity.admin.BarangActivity">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">

@@ -1,18 +1,186 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    android:id="@+id/contentView"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".activity.admin.BarangActivity">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <LinearLayout
+                android:id="@+id/searchLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/primaryColor"
+                android:orientation="horizontal"
+                android:padding="16dp"
+                android:gravity="center_vertical">
 
-    <TextView
+                <ImageView
+                    android:layout_width="@dimen/_25sdp"
+                    android:layout_height="@dimen/_25sdp"
+                    android:background="@drawable/ic_qr"
+                    android:backgroundTint="@color/white"
+                    android:layout_marginEnd="8dp" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="SCANNER"
+                    android:textSize="@dimen/_16sdp"
+                    android:textStyle="bold"
+                    android:textColor="@android:color/white"
+                    android:textColorHint="@android:color/white"
+                    android:background="@android:color/transparent"
+                    />
+                <ImageView
+                    android:id="@+id/btnLogout"
+                    android:layout_width="@dimen/_25sdp"
+                    android:layout_height="@dimen/_25sdp"
+                    android:background="@drawable/ic_logout"
+                    android:backgroundTint="@color/white"
+                    android:layout_marginEnd="8dp" />
+
+            </LinearLayout>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_centerInParent="true"
+            android:paddingLeft="@dimen/_10sdp"
+            android:paddingRight="@dimen/_10sdp"
+            android:orientation="vertical">
+            <TextView
+                android:id="@+id/txCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:textSize="@dimen/_56sdp"
+                android:textStyle="bold" />
+            <TextView
+                android:id="@+id/txName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Scan First!"
+                android:textSize="@dimen/_16sdp"
+                android:textStyle="bold" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Barang telah berhasil di scan"
+                android:textSize="@dimen/_12sdp"
+                android:layout_marginBottom="@dimen/_15sdp"
+                android:textStyle="bold" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:paddingLeft="@dimen/_10sdp"
+            android:paddingRight="@dimen/_10sdp"
+            android:gravity="center">
+
+            <LinearLayout
+                android:layout_width="@dimen/_180sdp"
+                android:layout_height="@dimen/_80sdp"
+                android:background="@drawable/top_circle"
+                android:backgroundTint="@color/primaryColorLight"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:padding="@dimen/_12sdp">
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerInParent="true"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingTop="@dimen/_10sdp"
+            android:paddingBottom="@dimen/_10sdp">
+
+            <LinearLayout
+                android:id="@+id/btnBarang"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_marginEnd="@dimen/_6sdp"
+                android:background="@drawable/bg_circle"
+                android:backgroundTint="@color/primaryColorDark"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:padding="@dimen/_12sdp">
+
+                <ImageView
+                    android:layout_width="@dimen/_25sdp"
+                    android:layout_height="@dimen/_25sdp"
+                    android:background="@drawable/ic_item"
+                    android:backgroundTint="@color/white" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingBottom="@dimen/_26sdp"
+                android:gravity="center">
+
+                <LinearLayout
+                    android:id="@+id/btnScan"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_circle"
+                    android:backgroundTint="@color/primaryColor"
+                    android:padding="@dimen/_12sdp">
+
+                    <ImageView
+                        android:layout_width="@dimen/_45sdp"
+                        android:layout_height="@dimen/_45sdp"
+                        android:background="@drawable/ic_qr"
+                        android:backgroundTint="@color/white" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/btnRefresh"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_marginStart="@dimen/_6sdp"
+                android:background="@drawable/bg_circle"
+                android:backgroundTint="@color/primaryColorDark"
+                android:gravity="bottom"
+                android:orientation="horizontal"
+                android:padding="@dimen/_12sdp">
+
+                <ImageView
+                    android:layout_width="@dimen/_25sdp"
+                    android:layout_height="@dimen/_25sdp"
+                    android:background="@drawable/ic_refresh"
+                    android:backgroundTint="@color/white" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </RelativeLayout>
+    <androidx.cardview.widget.CardView
+        android:id="@+id/btnTerima"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+        app:cardUseCompatPadding="true"
+        app:cardCornerRadius="@dimen/_10sdp"
+        app:cardBackgroundColor="@color/secondaryColor"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="@dimen/_10sdp"
+        android:layout_marginEnd="@dimen/_10sdp">
+    </androidx.cardview.widget.CardView>
+</RelativeLayout>
