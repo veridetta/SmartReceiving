@@ -16,7 +16,7 @@ import com.budiyev.android.codescanner.CodeScannerView
 import com.budiyev.android.codescanner.DecodeCallback
 import com.budiyev.android.codescanner.ErrorCallback
 import com.budiyev.android.codescanner.ScanMode
-import com.google.firebase.firestore.FirebaseFirestore
+import com.vr.smartreceiving.MainActivity
 import com.vr.smartreceiving.R
 import com.vr.smartreceiving.db.AppDatabase
 import com.vr.smartreceiving.helper.showSnack
@@ -25,7 +25,6 @@ import com.vr.smartreceiving.model.ScanModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.time.LocalDateTime
@@ -78,17 +77,19 @@ class ScanActivity : AppCompatActivity() {
                 try {
                     // Buat objek JSON dari string JSON
                     val jsonObject = JSONObject(jsonString)
+                    Log.d("JSON", jsonObject.toString())
                     // Dapatkan nilai "itemNum" dan "id" dari objek JSON
                     groupResult = jsonObject.getString("itemNum")
                     namaResult = jsonObject.getString("itemDesc")
                     kodeResult = jsonObject.getString("sequenceQr")
-                    if(group==""){
+                    if(group!=="kosong"){
                         cekDuplicate(kodeResult)
                     }else{
                         if(group==groupResult){
                             cekDuplicate(kodeResult)
                         }else{
                             showSnack(this, "Item tidak sesuai")
+                            Log.d("Group", group)
                             codeScanner.startPreview()
                         }
                     }
@@ -127,40 +128,39 @@ class ScanActivity : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     private fun cekDuplicate(itemId: String){
         progressDialog.show()
-        GlobalScope.launch(Dispatchers.IO) {
-            try {
-                //cek duplicate appDatabase
-                val db = AppDatabase.getInstance(this@ScanActivity)
-                val scan = db.scanDao().getscanByKode(itemId)
-                if(scan!=null){
-                    withContext(Dispatchers.Main){
-                        showSnack(this@ScanActivity, "Item sudah di scan")
-                        progressDialog.dismiss()
-                        codeScanner.startPreview()
-                    }
-                }else{
-                    //insert data ke appDatabase
-                    val scanModel = ScanModel(
-                        UUID.randomUUID().toString(),
-                        kodeResult,
-                        groupResult,
-                        namaResult,
-                        LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
-                    )
-                    db.scanDao().insert(scanModel)
-                    withContext(Dispatchers.Main){
-                        showSnack(this@ScanActivity, "Item berhasil di scan")
-                        progressDialog.dismiss()
-                        //intent ke ScanActivity
-                        val intent = Intent(this@ScanActivity, ScanActivity::class.java)
-                        intent.putExtra("group", groupResult)
-                        startActivity(intent)
-                        finish()
-                    }
-                }
-            } catch (e: Exception) {
-                Log.w("SCAN", "Error getting documents : $e")
+        val db = AppDatabase.getInstance(this@ScanActivity)
+        val scan = db.scanDao().getscanByKode(itemId)
+        if(scan!=null){
+            showSnack(this@ScanActivity, "Item sudah di scan")
+            progressDialog.dismiss()
+            codeScanner.startPreview()
+        }else{
+            val cari = db.barangDao().getbarangByKode(kodeResult)
+            if (cari!=null) {
+                //insert data ke appDatabase
+                val scanModel = ScanModel(
+                    null,
+                    kodeResult,
+                    namaResult,
+                    groupResult,
+                    LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                )
+                db.scanDao().insert(scanModel)
+
+                showSnack(this@ScanActivity, "Item berhasil di scan")
                 progressDialog.dismiss()
+                val sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE)
+                val editor = sharedPreferences.edit()
+                editor.putString("lastGroup", groupResult)
+                editor.apply()
+                val intent = Intent(this@ScanActivity, MainActivity::class.java)
+                intent.putExtra("group", groupResult)
+                startActivity(intent)
+                finish()
+            }else{
+                showSnack(this@ScanActivity, "Item tidak ditemukan")
+                progressDialog.dismiss()
+                codeScanner.startPreview()
             }
         }
 

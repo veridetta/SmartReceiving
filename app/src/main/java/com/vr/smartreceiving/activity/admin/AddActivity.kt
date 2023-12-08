@@ -13,11 +13,14 @@ import android.widget.RelativeLayout
 import android.widget.Spinner
 import android.widget.TextView
 import androidx.annotation.RequiresApi
-import com.google.firebase.firestore.FirebaseFirestore
 import com.vr.smartreceiving.R
 import com.vr.smartreceiving.db.AppDatabase
 import com.vr.smartreceiving.helper.showSnack
 import com.vr.smartreceiving.model.BarangModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.UUID
@@ -32,7 +35,7 @@ class AddActivity : AppCompatActivity() {
     lateinit var btnSimpan: Button
 
     private var type = "" //edit atau add
-    private var uid = ""
+    private var uid = 0
     private var kode = ""
     private var nama = ""
     private var group = ""
@@ -63,7 +66,7 @@ class AddActivity : AppCompatActivity() {
 
     private fun initIntent(){
         type = intent.getStringExtra("type").toString()
-        uid = intent.getStringExtra("uid").toString()
+        uid = intent.getIntExtra("uid",0)
         nama = intent.getStringExtra("nama").toString()
         kode = intent.getStringExtra("kode").toString()
         group = intent.getStringExtra("group").toString()
@@ -101,9 +104,15 @@ class AddActivity : AppCompatActivity() {
         }
         //tambah atau edit data
         if(type == "edit"){
-            editData()
+            if (!isFinishing) {
+                progressDialog.show()
+                editData()
+            }
         }else{
-            tambahData()
+            if (!isFinishing) {
+                progressDialog.show()
+                tambahData()
+            }
         }
 
     }
@@ -116,53 +125,70 @@ class AddActivity : AppCompatActivity() {
         }
     }
     private fun tambahData(){
-        progressDialog.show()
         //insert barang ke appdatabase
         val db = AppDatabase.getInstance(this)
         //cek kode barang sudah ada atau belum
-        val barangKode = db.barangDao().getbarangByKode(etKode.text.toString())
-        if(barangKode != null){
-            progressDialog.dismiss()
-            showSnack(this,"Kode barang sudah ada")
-            return
+        GlobalScope.launch {
+            val barangKode = db.barangDao().getbarangByKode(etKode.text.toString())
+            withContext(Dispatchers.Main){
+                if(barangKode != null){
+                    progressDialog.dismiss()
+                    showSnack(this@AddActivity,"Kode barang sudah ada")
+
+                }else{
+                    insertDaata()
+                }
+            }
+
         }
+    }
+    private fun insertDaata(){
         val barang = BarangModel(
-            UUID.randomUUID().toString(),
-            etNama.text.toString(),
+            null,
             etKode.text.toString(),
+            etNama.text.toString(),
             etGroup.text.toString(),
         )
-        db.barangDao().insert(barang)
-        progressDialog.dismiss()
-        showSnack(this,"Berhasil menambah barang")
-        val intent = Intent(this, BarangActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
-        startActivity(intent)
-        finish()
+        val db = AppDatabase.getInstance(this)
+        GlobalScope.launch {
+            db.barangDao().insert(barang)
+            withContext(Dispatchers.Main) {
+                progressDialog.dismiss()
+                showSnack(this@AddActivity, "Berhasil menambah barang")
+                val intent = Intent(this@AddActivity, BarangActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+                startActivity(intent)
+                finish()
+            }
+        }
     }
     private fun editData(){
-        progressDialog.show()
         //insert barang ke appdatabase
         val db = AppDatabase.getInstance(this)
         //cek kode barang sudah ada atau belum
-        val barangKode = db.barangDao().getbarangByKode(etKode.text.toString())
-        if(barangKode != null && barangKode.uid != uid){
-            progressDialog.dismiss()
-            showSnack(this,"Kode barang sudah ada")
-            return
+        GlobalScope.launch {
+            val barang = BarangModel(
+                uid,
+                etNama.text.toString(),
+                etKode.text.toString(),
+                etGroup.text.toString(),
+            )
+            db.barangDao().update(barang)
+            withContext(Dispatchers.Main){
+
+                progressDialog.dismiss()
+                showSnack(this@AddActivity,"Berhasil mengedit barang")
+                val intent = Intent(this@AddActivity, BarangActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+                startActivity(intent)
+                finish()
+            }
+
         }
-        val barang = BarangModel(
-            uid,
-            etNama.text.toString(),
-            etKode.text.toString(),
-            etGroup.text.toString(),
-        )
-        db.barangDao().update(barang)
-        progressDialog.dismiss()
-        showSnack(this,"Berhasil mengedit barang")
-        val intent = Intent(this, BarangActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
-        startActivity(intent)
-        finish()
     }
+    override fun onDestroy() {
+        progressDialog.dismiss()
+        super.onDestroy()
+    }
+
 }

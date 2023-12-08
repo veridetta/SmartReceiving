@@ -15,30 +15,12 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
             <TextView
-                android:id="@+id/tvMerek"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="(FDR)"
-                android:textSize="@dimen/_13sdp"
-                android:layout_marginEnd="@dimen/_3sdp"
-                android:textColor="@android:color/black"
-                android:layout_marginTop="8dp" />
-            <TextView
                 android:id="@+id/tvNama"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Nama Latin"
                 android:textSize="@dimen/_13sdp"
                 android:textStyle="bold"
-                android:textColor="@android:color/black"
-                android:layout_marginTop="8dp" />
-            <TextView
-                android:id="@+id/tvJenis"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="- OEM"
-                android:textSize="@dimen/_13sdp"
-                android:layout_marginStart="@dimen/_3sdp"
                 android:textColor="@android:color/black"
                 android:layout_marginTop="8dp" />
         </LinearLayout>

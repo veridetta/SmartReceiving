@@ -13,12 +13,12 @@ interface ScanDao {
     @Query("SELECT * FROM scan WHERE kode = :kode")
     fun getscanByKode(kode: String): ScanModel
 
-    @Query("SELECT COUNT(*) FROM scan WHERE `group` = :group")
-    fun countScanByGroup(group: String): Int
+    @Query("SELECT COUNT(*) FROM scan WHERE kelompok = :kelompok")
+    fun countScanByGroup(kelompok: String): Int
 
     //get by group first item
-    @Query("SELECT * FROM scan WHERE `group` = :group LIMIT 1")
-    fun getScanByGroup(group: String): ScanModel
+    @Query("SELECT * FROM scan WHERE kelompok = :kelompok LIMIT 1")
+    fun getScanByGroup(kelompok: String): ScanModel
 
     @Insert
     fun insert(scan:ScanModel)

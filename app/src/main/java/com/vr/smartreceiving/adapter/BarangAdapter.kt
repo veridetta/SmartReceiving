@@ -61,22 +61,14 @@ class BarangAdapter(
         val currentBarang = filteredBarangList[position]
 
         holder.tvNama.text = currentBarang.nama
-        holder.tvMerek.text = "("+currentBarang.merek+")"
-        if(currentBarang.jenis == ""){
-            holder.tvJenis.text = ""
-        }else{
-            holder.tvJenis.text = " - "+currentBarang.jenis
-        }
-        holder.tvQr.text = currentBarang.kode1+" "+currentBarang.kode2
-        holder.tvPerdus.text = currentBarang.perRak+" "+currentBarang.satuan+" /Rack"
+        holder.tvQr.text = currentBarang.kode
+        holder.tvPerdus.text = currentBarang.kelompok
         holder.btnUbah.setOnClickListener { onEditClickListener(currentBarang) }
         holder.btnHapus.setOnClickListener { onHapusClickListener(currentBarang) }
     }
 
     inner class ProductViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val tvNama: TextView = itemView.findViewById(R.id.tvNama)
-        val tvMerek: TextView = itemView.findViewById(R.id.tvMerek)
-        val tvJenis: TextView = itemView.findViewById(R.id.tvJenis)
         val tvQr: TextView = itemView.findViewById(R.id.tvQr)
         val tvPerdus: TextView = itemView.findViewById(R.id.tvPerdus)
         val btnUbah: LinearLayout = itemView.findViewById(R.id.btnUbah)

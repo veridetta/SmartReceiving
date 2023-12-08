@@ -15,7 +15,6 @@ import android.widget.RelativeLayout
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.firebase.firestore.FirebaseFirestore
 import com.vr.smartreceiving.R
 import com.vr.smartreceiving.activity.LoginActivity
 import com.vr.smartreceiving.adapter.BarangAdapter
@@ -25,7 +24,6 @@ import com.vr.smartreceiving.model.BarangModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 
 class BarangActivity : AppCompatActivity() {
@@ -37,6 +35,8 @@ class BarangActivity : AppCompatActivity() {
     private lateinit var btnCari: EditText
     private lateinit var btnAdd: CardView
     private lateinit var progressDialog: ProgressDialog
+
+    private lateinit var database: AppDatabase
 
     val TAG = "LOAD DATA AdminActvy"
     private val barangList: MutableList<BarangModel> = mutableListOf()
@@ -59,6 +59,7 @@ class BarangActivity : AppCompatActivity() {
         progressDialog = ProgressDialog(this)
         progressDialog.setMessage("Loading...")
         progressDialog.setCancelable(false)
+        database = AppDatabase.getInstance(applicationContext)
 
     }
     private fun initRc(){
@@ -104,6 +105,7 @@ class BarangActivity : AppCompatActivity() {
                 withContext(Dispatchers.Main) {
                     barangList.clear() // Membersihkan list sebelum memasukkan data baru
                     barangList.addAll(barangFromRoom) // Menambahkan data dari Room ke dalam list
+                    barangAdapter.filteredBarangList.addAll(barangFromRoom)
                     barangAdapter.notifyDataSetChanged() // Memberitahu adapter bahwa data telah berubah
                     progressDialog.dismiss()
                 }
@@ -121,7 +123,7 @@ class BarangActivity : AppCompatActivity() {
         intent.putExtra("type", "edit")
         intent.putExtra("uid", barang.uid)
         intent.putExtra("nama", barang.nama)
-        intent.putExtra("group", barang.group)
+        intent.putExtra("group", barang.kelompok)
         intent.putExtra("kode", barang.kode)
         startActivity(intent)
     }
@@ -137,11 +139,13 @@ class BarangActivity : AppCompatActivity() {
                     //hapus barang dari database room
                     val db = AppDatabase.getInstance(this@BarangActivity)
                     //hapus barang dari barangList
+                    val barangDao = db.barangDao()
+                    barangDao.delete(barang.uid!!.toInt())
                     withContext(Dispatchers.Main) {
                         progressDialog.dismiss()
                         showSnack(this@BarangActivity, "Berhasil menghapus ${barang.nama}")
                         val intent = Intent(this@BarangActivity, BarangActivity::class.java)
-                        intent.putExtra("group", barang.group)
+                        intent.putExtra("group", barang.kelompok)
                         startActivity(intent)
                     }
                 } catch (e: Exception) {

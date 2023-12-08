@@ -6,11 +6,10 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "scan")
 class ScanModel(
     //uid primarykey autoincrement
-    @PrimaryKey
-    var uid: String,
+    @PrimaryKey(autoGenerate = true) var uid:Int? = null,
     var kode: String,
     var nama: String,
-    var group: String,
+    var kelompok: String,
     var scanAt: String,
 )
 

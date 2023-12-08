@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -11,6 +12,12 @@ import com.vr.smartreceiving.activity.LoginActivity
 import com.vr.smartreceiving.activity.admin.BarangActivity
 import com.vr.smartreceiving.activity.admin.ScanActivity
 import com.vr.smartreceiving.db.AppDatabase
+import com.vr.smartreceiving.model.BarangModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MainActivity : AppCompatActivity() {
     lateinit var btnScan:LinearLayout
@@ -19,6 +26,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var btnRefresh:LinearLayout
     lateinit var txCount:TextView
     lateinit var txName:TextView
+    private lateinit var database: AppDatabase
 
     var sCount = 0
     var sName = ""
@@ -38,20 +46,34 @@ class MainActivity : AppCompatActivity() {
         btnRefresh = findViewById(R.id.btnRefresh)
         txCount = findViewById(R.id.txCount)
         txName = findViewById(R.id.txName)
+
+        database = AppDatabase.getInstance(applicationContext)
     }
 
     private fun initIntent(){
         sName = intent.getStringExtra("name").toString()
-        sGroup = intent.getStringExtra("group").toString()
+        //gruop ambil dari shared preferences
+        val sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+        sGroup = sharedPreferences.getString("lastGroup", "kosong").toString()
+        Log.d("group", sGroup)
     }
 
     private fun initDB(){
-        if(sGroup!==""){
+        if(sGroup!=="kosong"){
             val db = AppDatabase.getInstance(this)
-            sCount = db.scanDao().countScanByGroup(sGroup)
-            txCount.text = sCount.toString()
-            val firstQuery = db.scanDao().getScanByGroup(sGroup)
-            txName.text = firstQuery.nama
+            GlobalScope.launch {
+                sCount = db.scanDao().countScanByGroup(sGroup)
+                val firstQuery = db.scanDao().getScanByGroup(sGroup)
+                val getAll = db.barangDao().getAllbarang()
+                Log.d("getAlll", getAll[0].nama.toString())
+                withContext(Dispatchers.Main){
+                    Log.d("count", sCount.toString())
+                    txCount.text = sCount.toString()
+                    if (firstQuery!=null){
+                        txName.text = firstQuery.nama
+                    }
+                }
+            }
         }
     }
 
@@ -59,7 +81,7 @@ class MainActivity : AppCompatActivity() {
         btnScan.setOnClickListener {
             //intent ke ScanActivity
             val intent = Intent(this, ScanActivity::class.java)
-            intent.putExtra("group", sGroup)
+            intent.putExtra("group", "kosong")
             startActivity(intent)
         }
         btnLogout.setOnClickListener {
@@ -84,9 +106,14 @@ class MainActivity : AppCompatActivity() {
         btnRefresh.setOnClickListener {
             //intent ke homeActivity fragment add
             val intent = Intent(this, ScanActivity::class.java)
-            intent.putExtra("group", "")
+            intent.putExtra("group", "kosong")
             startActivity(intent)
             finish()
         }
+    }
+    //onresume
+    override fun onResume() {
+        super.onResume()
+        initDB()
     }
 }

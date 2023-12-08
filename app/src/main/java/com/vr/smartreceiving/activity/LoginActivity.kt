@@ -42,7 +42,7 @@ class LoginActivity : AppCompatActivity() {
             if(email.isEmpty() || password.isEmpty()) {
                 progressDialog.dismiss()
                 showSnack(this, "Oops, masih ada yang kosong.")
-            }else if(email=="admin@gmail.com" && password=="admin"){
+            }else if(email=="admin" && password=="admin"){
                 val sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE)
                 val editor = sharedPreferences.edit()
                 var userRole = "admin"

@@ -29,11 +29,8 @@ class SplashActivity : AppCompatActivity() {
         // Periksa apakah pengguna sudah login
         val sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE)
         val isLoggedIn = sharedPreferences.getBoolean("isLogin", false)
-        // Initialize Firebase
-        val db = Room.databaseBuilder(
-            applicationContext,
-            AppDatabase::class.java, "receiving-db"
-        ).build()
+        //initial databse
+
         Handler(Looper.getMainLooper()).postDelayed({
             checkUserLogin()
         }, 1000) // Jeda selama 1 detik

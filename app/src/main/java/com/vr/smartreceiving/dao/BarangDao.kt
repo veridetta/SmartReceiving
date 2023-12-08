@@ -19,4 +19,8 @@ interface BarangDao {
     @Update
     fun update(barang: BarangModel)
 
+    @Query("DELETE FROM barang WHERE uid = :uid")
+    fun delete(uid: Int)
+
+
 }
