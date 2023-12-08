@@ -2,16 +2,20 @@ package com.vr.smartreceiving
 
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.vr.smartreceiving.activity.LoginActivity
 import com.vr.smartreceiving.activity.admin.BarangActivity
 import com.vr.smartreceiving.activity.admin.ScanActivity
 import com.vr.smartreceiving.db.AppDatabase
+import com.vr.smartreceiving.helper.showSnack
 import com.vr.smartreceiving.model.BarangModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -27,6 +31,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var txCount:TextView
     lateinit var txName:TextView
     private lateinit var database: AppDatabase
+    private val CAMERA_PERMISSION_CODE = 101
 
     var sCount = 0
     var sName = ""
@@ -38,6 +43,7 @@ class MainActivity : AppCompatActivity() {
         initIntent()
         initDB()
         initAction()
+        requestCameraPermission()
     }
     private fun initView(){
         btnScan = findViewById(R.id.btnScan)
@@ -105,7 +111,7 @@ class MainActivity : AppCompatActivity() {
         }
         btnRefresh.setOnClickListener {
             //intent ke homeActivity fragment add
-            val intent = Intent(this, ScanActivity::class.java)
+            val intent = Intent(this, MainActivity::class.java)
             intent.putExtra("group", "kosong")
             startActivity(intent)
             finish()
@@ -115,5 +121,38 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         initDB()
+    }
+    private fun requestCameraPermission() {
+        if (ContextCompat.checkSelfPermission(
+                this,
+                android.Manifest.permission.CAMERA
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(android.Manifest.permission.CAMERA),
+                CAMERA_PERMISSION_CODE
+            )
+        } else {
+            showSnack(this,"Izin kamera sudah diberikan")
+        }
+    }
+
+    // Override dari callback hasil permintaan izin
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == CAMERA_PERMISSION_CODE) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Izin kamera diberikan oleh pengguna
+                // Lakukan tindakan yang diperlukan saat izin kamera sudah ada di sini
+            } else {
+                // Izin kamera ditolak oleh pengguna
+                // Handle kasus saat pengguna menolak akses kamera di sini
+            }
+        }
     }
 }
