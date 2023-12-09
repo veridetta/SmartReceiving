@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Smart Receiving</string>
+    <string name="app_name">Smart Counting</string>
     <string-array name="merek">
         <item>FDR</item>
         <item>Federal</item>

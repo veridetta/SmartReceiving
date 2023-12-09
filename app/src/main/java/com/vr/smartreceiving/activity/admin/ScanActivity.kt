@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import com.budiyev.android.codescanner.AutoFocusMode
@@ -43,6 +44,7 @@ class ScanActivity : AppCompatActivity() {
     var status = true
     private lateinit var codeScanner: CodeScanner
     private lateinit var scannerView: CodeScannerView
+    private lateinit var btnSelesai: TextView
     private lateinit var progressDialog : ProgressDialog
     private var mediaPlayer: MediaPlayer? = null
     @RequiresApi(Build.VERSION_CODES.O)
@@ -56,18 +58,24 @@ class ScanActivity : AppCompatActivity() {
     private fun initView(){
         scannerView = findViewById<CodeScannerView>(R.id.scanner_view)
         codeScanner = CodeScanner(this, scannerView)
+        btnSelesai = findViewById(R.id.btnSelesai)
         progressDialog = ProgressDialog(this)
         progressDialog.setMessage("Loading...")
         progressDialog.setCancelable(false)
         // Inisialisasi MediaPlayer
         mediaPlayer = MediaPlayer.create(this, R.raw.sound)
+        btnSelesai.setOnClickListener {
+            val intent = Intent(this@ScanActivity, MainActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
     }
     @RequiresApi(Build.VERSION_CODES.O)
     private fun initCodeScanner(){
         codeScanner.camera = CodeScanner.CAMERA_BACK
         codeScanner.formats = CodeScanner.ALL_FORMATS // list of type BarcodeFormat,
         codeScanner.autoFocusMode = AutoFocusMode.SAFE // or CONTINUOUS
-        codeScanner.scanMode = ScanMode.SINGLE // or CONTINUOUS or PREVIEW
+        codeScanner.scanMode = ScanMode.CONTINUOUS // or CONTINUOUS or PREVIEW
         codeScanner.isAutoFocusEnabled = true // Whether to enable auto focus or not
         codeScanner.isFlashEnabled = false // Whether to enable flash or not
         codeScanner.decodeCallback = DecodeCallback {
@@ -135,7 +143,7 @@ class ScanActivity : AppCompatActivity() {
             progressDialog.dismiss()
             codeScanner.startPreview()
         }else{
-            val cari = db.barangDao().getbarangByKode(kodeResult)
+            val cari = db.barangDao().getbarangByKelompok(groupResult)
             if (cari!=null) {
                 //insert data ke appDatabase
                 val scanModel = ScanModel(
@@ -148,15 +156,17 @@ class ScanActivity : AppCompatActivity() {
                 db.scanDao().insert(scanModel)
 
                 showSnack(this@ScanActivity, "Item berhasil di scan")
+                mediaPlayer?.start()
                 progressDialog.dismiss()
                 val sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE)
                 val editor = sharedPreferences.edit()
                 editor.putString("lastGroup", groupResult)
                 editor.apply()
-                val intent = Intent(this@ScanActivity, MainActivity::class.java)
-                intent.putExtra("group", groupResult)
-                startActivity(intent)
-                finish()
+//                val intent = Intent(this@ScanActivity, MainActivity::class.java)
+//                intent.putExtra("group", groupResult)
+//                startActivity(intent)
+//                finish()
+                codeScanner.startPreview()
             }else{
                 showSnack(this@ScanActivity, "Item tidak ditemukan")
                 progressDialog.dismiss()

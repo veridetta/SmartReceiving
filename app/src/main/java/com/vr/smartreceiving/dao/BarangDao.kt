@@ -13,6 +13,10 @@ interface BarangDao {
     //get barang bykode
     @Query("SELECT * FROM barang WHERE kode = :kode")
     fun getbarangByKode(kode: String): BarangModel
+    //get barang by kelompok
+    @Query("SELECT * FROM barang WHERE kelompok = :kelompok")
+    fun getbarangByKelompok(kelompok: String): BarangModel
+
     @Insert
     fun insert(barang:BarangModel)
 
